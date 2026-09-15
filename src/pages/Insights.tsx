@@ -95,8 +95,8 @@ const insightColors: Record<string, { bg: string; text: string; icon: string }> 
 
 export default function Insights() {
   return (
-    <div className="max-w-[1600px] mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 w-full">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#111]">Insights</h1>
           <p className="text-sm text-[#6B7280] mt-1">Analytics and AI-powered recommendations</p>
@@ -104,8 +104,8 @@ export default function Insights() {
       </div>
 
       {/* Top stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0">
           <div className="flex items-center justify-between mb-3">
             <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
               <Clock size={18} className="text-blue-500" />
@@ -118,7 +118,7 @@ export default function Insights() {
           <p className="text-2xl font-bold text-[#111]">1.52s</p>
           <p className="text-xs text-[#6B7280]">Avg latency</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0">
           <div className="flex items-center justify-between mb-3">
             <div className="w-9 h-9 rounded-xl bg-green-50 flex items-center justify-center">
               <DollarSign size={18} className="text-green-500" />
@@ -131,7 +131,7 @@ export default function Insights() {
           <p className="text-2xl font-bold text-[#111]">$54.40</p>
           <p className="text-xs text-[#6B7280]">Cost today</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0">
           <div className="flex items-center justify-between mb-3">
             <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center">
               <AlertTriangle size={18} className="text-red-500" />
@@ -144,7 +144,7 @@ export default function Insights() {
           <p className="text-2xl font-bold text-[#111]">0.9%</p>
           <p className="text-xs text-[#6B7280]">Error rate</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0">
           <div className="flex items-center justify-between mb-3">
             <div className="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center">
               <Zap size={18} className="text-purple-500" />
@@ -160,9 +160,9 @@ export default function Insights() {
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
         {/* Latency chart */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-w-0">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-base font-semibold text-[#111]">Latency Over Time</h2>
@@ -191,7 +191,7 @@ export default function Insights() {
         </div>
 
         {/* Cost per agent */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-w-0">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-base font-semibold text-[#111]">Cost per Agent</h2>
@@ -214,7 +214,7 @@ export default function Insights() {
         </div>
 
         {/* Error rate */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-w-0">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-base font-semibold text-[#111]">Error Rate Trends</h2>
@@ -237,7 +237,7 @@ export default function Insights() {
         </div>
 
         {/* AI Insights feed */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-w-0">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-base font-semibold text-[#111]">AI Insights</h2>

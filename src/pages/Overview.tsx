@@ -1,3 +1,5 @@
+import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Search,
   Brain,
@@ -18,9 +20,17 @@ import {
   GitBranch,
   ArrowRightLeft,
   Zap,
+  ChevronDown,
+  X,
+  Check,
 } from 'lucide-react';
+import type { Page } from '../App';
 
-const agents = [
+interface OverviewProps {
+  setActivePage?: (page: Page) => void;
+}
+
+const allAgents = [
   { name: 'Researcher', role: 'Search & Research', icon: Search, color: 'green', calls: 142 },
   { name: 'Supervisor', role: 'Routing & Delegation', icon: Brain, color: 'purple', calls: 89 },
   { name: 'DataFetcher', role: 'Data Pipeline', icon: Database, color: 'blue', calls: 234 },
@@ -44,10 +54,10 @@ const timelineData = [
   { agent: 'Responder', segments: [{ start: 35, width: 10, status: 'Generating', state: 'healthy' }, { start: 65, width: 20, status: 'Responding', state: 'healthy' }] },
 ];
 
-const nextSteps = [
-  { title: 'Configure alert thresholds', desc: 'Set latency and error rate thresholds for your agents', tag: 'Do first', workflows: 3, time: '5 min', priority: true },
-  { title: 'Add handoff rules', desc: 'Define routing logic between Researcher and Validator', tag: 'Recommended', workflows: 2, time: '10 min', priority: false },
-  { title: 'Enable trace sampling', desc: 'Reduce storage costs by sampling 10% of traces', tag: 'Optional', workflows: 1, time: '2 min', priority: false },
+const initialNextSteps = [
+  { id: 1, title: 'Configure alert thresholds', desc: 'Set latency and error rate thresholds for your agents', tag: 'Do first', workflows: 3, time: '5 min', priority: true, completed: false },
+  { id: 2, title: 'Add handoff rules', desc: 'Define routing logic between Researcher and Validator', tag: 'Recommended', workflows: 2, time: '10 min', priority: false, completed: false },
+  { id: 3, title: 'Enable trace sampling', desc: 'Reduce storage costs by sampling 10% of traces', tag: 'Optional', workflows: 1, time: '2 min', priority: false, completed: false },
 ];
 
 const quickActions = ['Optimize latency', 'Find errors', 'Cost analysis', 'Agent health'];
@@ -57,34 +67,221 @@ const suggestedQuestions = [
   'Show me the slowest agent handoff',
 ];
 
+const timeRanges = ['Last 1h', 'Last 24h', 'Last 7d', 'Last 30d', 'Custom'];
+
 export default function Overview() {
+  const navigate = useNavigate();
+  const [showFilter, setShowFilter] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [selectedTimeRange, setSelectedTimeRange] = useState('Last 1h');
+  const [filterAgent, setFilterAgent] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [nextSteps, setNextSteps] = useState(initialNextSteps);
+  const [chatInput, setChatInput] = useState('');
+  const [chatMessages, setChatMessages] = useState<{ role: string; text: string }[]>([]);
+  const [showConfigModal, setShowConfigModal] = useState<number | null>(null);
+
+  const filterRef = useRef<HTMLDivElement>(null);
+  const timeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
+        setShowFilter(false);
+      }
+      if (timeRef.current && !timeRef.current.contains(e.target as Node)) {
+        setShowTimePicker(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Filter agents and timeline based on selections
+  const filteredAgents = allAgents.filter(a => {
+    if (filterAgent !== 'all' && a.name !== filterAgent) return false;
+    return true;
+  });
+
+  const filteredTimeline = timelineData.filter(row => {
+    if (filterAgent !== 'all' && row.agent !== filterAgent) return false;
+    return true;
+  });
+
+  const handleCompleteStep = (id: number) => {
+    setNextSteps(prev => prev.map(s => s.id === id ? { ...s, completed: !s.completed } : s));
+  };
+
+  const handleSendMessage = () => {
+    if (!chatInput.trim()) return;
+    const userMsg = chatInput.trim();
+    setChatMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+    setChatInput('');
+    // Mock AI response
+    setTimeout(() => {
+      const responses: Record<string, string> = {
+        'Why is the Validator still pending?': 'The Validator is waiting for DataFetcher to complete its current batch. The payload size (12.4MB) triggered chunked processing, adding ~2s latency. Consider increasing the batch threshold.',
+        'What caused the 3 errors in the last hour?': 'All 3 errors originated from DataFetcher timeouts on payloads >10MB. Root cause: external API rate limiting. Recommended fix: implement request queuing with exponential backoff.',
+        'Show me the slowest agent handoff': 'The slowest handoff is Supervisor → DataFetcher at avg 1.8s. This is due to payload serialization. Switching to streaming could reduce this by ~60%.',
+      };
+      const response = responses[userMsg] || `Based on my analysis of your agent system, I can see that ${userMsg.toLowerCase().includes('error') ? 'there are some patterns worth investigating' : 'your system is performing within expected parameters'}. Would you like me to dive deeper into any specific agent or workflow?`;
+      setChatMessages(prev => [...prev, { role: 'assistant', text: response }]);
+    }, 800);
+  };
+
+  const handleQuickAction = (action: string) => {
+    setChatInput(action);
+  };
+
+  const handleSuggestedQuestion = (q: string) => {
+    setChatInput(q);
+    // Auto-submit
+    setTimeout(() => {
+      setChatMessages(prev => [...prev, { role: 'user', text: q }]);
+      setChatInput('');
+      setTimeout(() => {
+        const responses: Record<string, string> = {
+          'Why is the Validator still pending?': 'The Validator is waiting for DataFetcher to complete its current batch. The payload size (12.4MB) triggered chunked processing, adding ~2s latency.',
+          'What caused the 3 errors in the last hour?': 'All 3 errors originated from DataFetcher timeouts on payloads >10MB. Root cause: external API rate limiting.',
+          'Show me the slowest agent handoff': 'The slowest handoff is Supervisor → DataFetcher at avg 1.8s due to payload serialization.',
+        };
+        const response = responses[q] || 'Analyzing your agent system... I see patterns that could be optimized. Let me know if you want specific recommendations.';
+        setChatMessages(prev => [...prev, { role: 'assistant', text: response }]);
+      }, 800);
+    }, 100);
+  };
+
   return (
-    <div className="space-y-6 max-w-[1600px] mx-auto">
+    <div className="space-y-6 w-full">
       {/* Hero Card */}
-      <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+      <div className="bg-white rounded-3xl p-6 lg:p-8 shadow-sm border border-gray-100">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl lg:text-4xl font-bold text-[#111] tracking-tight">
+          <div className="min-w-0">
+            <h1 className="text-2xl lg:text-4xl font-bold text-[#111] tracking-tight">
               We found your system
             </h1>
-            <p className="mt-2 text-[#6B7280] text-lg">
+            <p className="mt-2 text-[#6B7280] text-base lg:text-lg">
               Auto-detected 6 agents across 2 workflows with 412 events in the last hour.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-full text-sm font-medium">
-              <CheckCircle2 size={16} />
+          <div className="flex flex-wrap items-center gap-2 lg:gap-3">
+            <span className="inline-flex items-center gap-2 px-3 lg:px-4 py-2 bg-green-50 text-green-700 rounded-full text-xs lg:text-sm font-medium whitespace-nowrap">
+              <CheckCircle2 size={14} />
               Setup complete · 5 of 6
             </span>
-            <button className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-600 rounded-full text-sm font-medium hover:bg-gray-100 transition-all">
-              <Clock size={14} />
-              Last 1 hour
-            </button>
-            <button className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-600 rounded-full text-sm font-medium hover:bg-gray-100 transition-all">
-              <Filter size={14} />
-              Filter
-            </button>
-            <button className="inline-flex items-center gap-2 px-4 py-2 bg-[#2F5CFF] text-white rounded-full text-sm font-medium hover:bg-blue-600 transition-all shadow-sm">
+
+            {/* Date/Time Picker - Fix #9 */}
+            <div className="relative" ref={timeRef}>
+              <button
+                onClick={() => { setShowTimePicker(!showTimePicker); setShowFilter(false); }}
+                className="inline-flex items-center gap-2 px-3 lg:px-4 py-2 bg-gray-50 text-gray-600 rounded-full text-xs lg:text-sm font-medium hover:bg-gray-100 active:bg-gray-200 transition-all"
+              >
+                <Clock size={14} />
+                {selectedTimeRange}
+                <ChevronDown size={12} />
+              </button>
+              {showTimePicker && (
+                <div className="absolute right-0 top-12 w-48 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 animate-fadeIn py-2">
+                  {timeRanges.map((range) => (
+                    <button
+                      key={range}
+                      onClick={() => { setSelectedTimeRange(range); setShowTimePicker(false); }}
+                      className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-all flex items-center justify-between ${
+                        selectedTimeRange === range ? 'text-[#2F5CFF] font-medium' : 'text-gray-700'
+                      }`}
+                    >
+                      {range}
+                      {selectedTimeRange === range && <Check size={14} className="text-[#2F5CFF]" />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Filter Button - Fix #8 */}
+            <div className="relative" ref={filterRef}>
+              <button
+                onClick={() => { setShowFilter(!showFilter); setShowTimePicker(false); }}
+                className={`inline-flex items-center gap-2 px-3 lg:px-4 py-2 rounded-full text-xs lg:text-sm font-medium transition-all ${
+                  filterAgent !== 'all' || filterStatus !== 'all'
+                    ? 'bg-blue-50 text-[#2F5CFF] border border-blue-200'
+                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100 active:bg-gray-200'
+                }`}
+              >
+                <Filter size={14} />
+                Filter
+                {(filterAgent !== 'all' || filterStatus !== 'all') && (
+                  <span className="w-4 h-4 rounded-full bg-[#2F5CFF] text-white text-[10px] flex items-center justify-center">
+                    {(filterAgent !== 'all' ? 1 : 0) + (filterStatus !== 'all' ? 1 : 0)}
+                  </span>
+                )}
+              </button>
+              {showFilter && (
+                <div className="absolute right-0 top-12 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 animate-fadeIn p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-semibold text-[#111]">Filters</h3>
+                    <button
+                      onClick={() => { setFilterAgent('all'); setFilterStatus('all'); }}
+                      className="text-xs text-[#2F5CFF] hover:underline"
+                    >
+                      Clear all
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs font-medium text-[#6B7280] mb-1.5 block">Agent</label>
+                      <select
+                        value={filterAgent}
+                        onChange={(e) => setFilterAgent(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#2F5CFF]"
+                      >
+                        <option value="all">All agents</option>
+                        {allAgents.map(a => <option key={a.name} value={a.name}>{a.name}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-[#6B7280] mb-1.5 block">Status</label>
+                      <div className="flex flex-wrap gap-1.5">
+                        {['all', 'healthy', 'pending', 'error'].map((s) => (
+                          <button
+                            key={s}
+                            onClick={() => setFilterStatus(s)}
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                              filterStatus === s
+                                ? 'bg-[#2F5CFF] text-white'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
+                          >
+                            {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-[#6B7280] mb-1.5 block">Date range</label>
+                      <select className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200">
+                        <option>Last 1 hour</option>
+                        <option>Last 24 hours</option>
+                        <option>Last 7 days</option>
+                        <option>Custom</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowFilter(false)}
+                    className="w-full mt-4 py-2 bg-[#2F5CFF] text-white rounded-xl text-sm font-medium hover:bg-blue-600 transition-all active:scale-[0.98]"
+                  >
+                    Apply filters
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Live Map button - Fix #8 */}
+            <button
+              onClick={() => navigate('/livemap')}
+              className="inline-flex items-center gap-2 px-3 lg:px-4 py-2 bg-[#2F5CFF] text-white rounded-full text-xs lg:text-sm font-medium hover:bg-blue-600 active:bg-blue-700 transition-all shadow-sm active:scale-[0.98]"
+            >
               <Map size={14} />
               Live Map
             </button>
@@ -93,18 +290,21 @@ export default function Overview() {
       </div>
 
       {/* Agents + Timeline */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 w-full">
         {/* Agents List */}
-        <div className="xl:col-span-3 bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-          <h2 className="text-lg font-semibold text-[#111] mb-4">Agents</h2>
-          <div className="space-y-3">
-            {agents.map((agent) => {
+        <div className="xl:col-span-3 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-w-0">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-[#111]">Agents</h2>
+            <span className="text-xs text-[#6B7280] bg-gray-50 px-2 py-1 rounded-full">{filteredAgents.length}</span>
+          </div>
+          <div className="space-y-2">
+            {filteredAgents.map((agent) => {
               const colors = colorMap[agent.color];
               const Icon = agent.icon;
               return (
                 <div
                   key={agent.name}
-                  className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 transition-all cursor-pointer group"
+                  className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 active:bg-gray-100 transition-all cursor-pointer group"
                 >
                   <div className={`w-10 h-10 rounded-full ${colors.bg} flex items-center justify-center flex-shrink-0`}>
                     <Icon size={18} className={colors.icon} />
@@ -113,25 +313,28 @@ export default function Overview() {
                     <p className="text-sm font-semibold text-[#111] truncate">{agent.name}</p>
                     <p className="text-xs text-[#6B7280] truncate">{agent.role}</p>
                   </div>
-                  <span className="text-xs font-medium text-[#6B7280] bg-gray-50 px-2 py-1 rounded-full">
+                  <span className="text-xs font-medium text-[#6B7280] bg-gray-50 px-2 py-1 rounded-full flex-shrink-0">
                     {agent.calls}
                   </span>
                 </div>
               );
             })}
+            {filteredAgents.length === 0 && (
+              <p className="text-sm text-[#6B7280] text-center py-4">No agents match filters</p>
+            )}
           </div>
         </div>
 
         {/* Timeline */}
-        <div className="xl:col-span-9 bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="xl:col-span-9 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-w-0">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-[#111]">Agent Activity Timeline</h2>
             <span className="text-xs text-[#6B7280]">15-min increments</span>
           </div>
           
-          {/* Time ticks */}
-          <div className="relative overflow-x-auto">
-            <div className="min-w-[600px]">
+          {/* Time ticks - contained scrollable area */}
+          <div className="overflow-x-auto -mx-2 px-2">
+            <div className="min-w-[500px]">
               <div className="flex justify-between mb-2 px-1">
                 {['09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30', '10:45'].map((t) => (
                   <span key={t} className="text-[10px] text-[#9CA3AF] font-medium">{t}</span>
@@ -140,8 +343,8 @@ export default function Overview() {
 
               {/* Timeline rows */}
               <div className="space-y-2">
-                {timelineData.map((row) => {
-                  const agentData = agents.find(a => a.name === row.agent);
+                {filteredTimeline.map((row) => {
+                  const agentData = allAgents.find(a => a.name === row.agent);
                   const colors = agentData ? colorMap[agentData.color] : colorMap.green;
                   const Icon = agentData?.icon || Search;
                   return (
@@ -152,7 +355,7 @@ export default function Overview() {
                         </div>
                         <span className="text-xs font-medium text-[#111] truncate">{row.agent}</span>
                       </div>
-                      <div className="flex-1 h-8 bg-gray-50 rounded-lg relative overflow-hidden">
+                      <div className="flex-1 h-8 bg-gray-50 rounded-lg relative overflow-hidden min-w-0">
                         {row.segments.map((seg, i) => (
                           <div
                             key={i}
@@ -174,6 +377,9 @@ export default function Overview() {
                     </div>
                   );
                 })}
+                {filteredTimeline.length === 0 && (
+                  <p className="text-sm text-[#6B7280] text-center py-8">No timeline data for selected filters</p>
+                )}
               </div>
             </div>
           </div>
@@ -181,25 +387,41 @@ export default function Overview() {
       </div>
 
       {/* Footer Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Next Steps */}
-        <div className="lg:col-span-4 bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
+        {/* Next Steps - Fix #11 */}
+        <div className="lg:col-span-4 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-w-0">
           <h2 className="text-lg font-semibold text-[#111] mb-4">Next steps</h2>
           <div className="space-y-3">
             {nextSteps.map((step) => (
               <div
-                key={step.title}
-                className="p-4 rounded-2xl border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all cursor-pointer group"
+                key={step.id}
+                onClick={() => handleCompleteStep(step.id)}
+                className={`p-4 rounded-2xl border transition-all cursor-pointer group ${
+                  step.completed
+                    ? 'border-green-200 bg-green-50/50'
+                    : 'border-gray-100 hover:shadow-md hover:border-gray-200 active:scale-[0.99]'
+                }`}
               >
                 <div className="flex items-start justify-between gap-2 mb-2">
-                  <h3 className="text-sm font-semibold text-[#111]">{step.title}</h3>
-                  {step.priority && (
+                  <h3 className={`text-sm font-semibold ${step.completed ? 'text-[#6B7280] line-through' : 'text-[#111]'}`}>
+                    {step.title}
+                  </h3>
+                  {step.completed ? (
+                    <span className="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-semibold rounded-full flex-shrink-0 flex items-center gap-1">
+                      <CheckCircle2 size={10} />
+                      Done
+                    </span>
+                  ) : step.priority ? (
                     <span className="px-2 py-0.5 bg-[#2F5CFF] text-white text-[10px] font-semibold rounded-full flex-shrink-0">
                       Do first
                     </span>
+                  ) : (
+                    <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] font-semibold rounded-full flex-shrink-0">
+                      {step.tag}
+                    </span>
                   )}
                 </div>
-                <p className="text-xs text-[#6B7280] mb-3">{step.desc}</p>
+                <p className={`text-xs mb-3 ${step.completed ? 'text-[#9CA3AF]' : 'text-[#6B7280]'}`}>{step.desc}</p>
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center gap-1 text-[10px] text-[#6B7280] bg-gray-50 px-2 py-1 rounded-full">
                     <Workflow size={10} />
@@ -220,7 +442,7 @@ export default function Overview() {
         </div>
 
         {/* Detected Stats */}
-        <div className="lg:col-span-4 bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div className="lg:col-span-4 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-w-0">
           <h2 className="text-lg font-semibold text-[#111] mb-4">Detected</h2>
           <div className="grid grid-cols-2 gap-3">
             <StatCard icon={Users} value="6" label="agents" sub="92% confidence" color="purple" />
@@ -230,24 +452,42 @@ export default function Overview() {
           </div>
         </div>
 
-        {/* AI Assistant */}
-        <div className="lg:col-span-4 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col">
+        {/* AI Assistant - Fix #10 */}
+        <div className="lg:col-span-4 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col min-w-0">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-blue-500 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-blue-500 flex items-center justify-center flex-shrink-0">
               <Sparkles size={14} className="text-white" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-sm font-semibold text-[#111]">AI Assistant</p>
-              <p className="text-[10px] text-[#6B7280]">Welcome, Alex — what can I help with today?</p>
+              <p className="text-[10px] text-[#6B7280]">Welcome, Alex — what can I help with?</p>
             </div>
           </div>
 
+          {/* Chat messages */}
+          {chatMessages.length > 0 && (
+            <div className="flex-1 overflow-y-auto mb-3 space-y-2 max-h-32">
+              {chatMessages.map((msg, i) => (
+                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[85%] px-3 py-2 rounded-2xl text-xs ${
+                    msg.role === 'user'
+                      ? 'bg-[#2F5CFF] text-white rounded-br-md'
+                      : 'bg-gray-100 text-[#111] rounded-bl-md'
+                  }`}>
+                    {msg.text}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Quick actions */}
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="flex flex-wrap gap-1.5 mb-3">
             {quickActions.map((action) => (
               <button
                 key={action}
-                className="px-3 py-1.5 bg-gray-50 text-gray-600 text-xs font-medium rounded-full hover:bg-gray-100 transition-all"
+                onClick={() => handleQuickAction(action)}
+                className="px-2.5 py-1.5 bg-gray-50 text-gray-600 text-[11px] font-medium rounded-full hover:bg-gray-100 active:bg-gray-200 transition-all"
               >
                 {action}
               </button>
@@ -255,47 +495,104 @@ export default function Overview() {
           </div>
 
           {/* Suggested questions */}
-          <div className="flex-1 space-y-2 mb-4">
-            {suggestedQuestions.map((q) => (
-              <button
-                key={q}
-                className="w-full text-left px-3 py-2 rounded-xl text-xs text-[#6B7280] hover:bg-gray-50 hover:text-[#111] transition-all flex items-center gap-2"
-              >
-                <ArrowRight size={12} className="text-[#2F5CFF] flex-shrink-0" />
-                {q}
-              </button>
-            ))}
-          </div>
+          {chatMessages.length === 0 && (
+            <div className="flex-1 space-y-1 mb-3">
+              {suggestedQuestions.map((q) => (
+                <button
+                  key={q}
+                  onClick={() => handleSuggestedQuestion(q)}
+                  className="w-full text-left px-3 py-2 rounded-xl text-xs text-[#6B7280] hover:bg-gray-50 hover:text-[#111] active:bg-gray-100 transition-all flex items-center gap-2"
+                >
+                  <ArrowRight size={12} className="text-[#2F5CFF] flex-shrink-0" />
+                  {q}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Chat input */}
-          <div className="border border-gray-200 rounded-2xl p-3">
+          <div className="border border-gray-200 rounded-2xl p-3 focus-within:border-[#2F5CFF] focus-within:ring-2 focus-within:ring-blue-100 transition-all">
             <div className="flex items-center gap-2">
               <input
                 type="text"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleSendMessage(); }}
                 placeholder="Ask about your agents..."
-                className="flex-1 text-sm text-[#111] placeholder:text-gray-400 outline-none bg-transparent"
+                className="flex-1 text-sm text-[#111] placeholder:text-gray-400 outline-none bg-transparent min-w-0"
               />
-              <span className="text-[10px] text-gray-300">0/500</span>
+              <span className="text-[10px] text-gray-300 flex-shrink-0">{chatInput.length}/500</span>
             </div>
             <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
               <div className="flex items-center gap-1">
-                <button className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-50 text-gray-400">
+                <button className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-50 active:bg-gray-100 text-gray-400 transition-all">
                   <Paperclip size={14} />
                 </button>
-                <button className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-50 text-gray-400">
+                <button className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-50 active:bg-gray-100 text-gray-400 transition-all">
                   <Sparkles size={14} />
                 </button>
-                <button className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-50 text-gray-400">
+                <button className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-50 active:bg-gray-100 text-gray-400 transition-all">
                   <Mic size={14} />
                 </button>
               </div>
-              <button className="w-7 h-7 flex items-center justify-center rounded-lg bg-[#2F5CFF] text-white hover:bg-blue-600 transition-all">
+              <button
+                onClick={handleSendMessage}
+                disabled={!chatInput.trim()}
+                className="w-7 h-7 flex items-center justify-center rounded-lg bg-[#2F5CFF] text-white hover:bg-blue-600 active:bg-blue-700 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              >
                 <Send size={14} />
               </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Config Modal */}
+      {showConfigModal !== null && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4" onClick={() => setShowConfigModal(null)}>
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-[#111]">
+                {nextSteps.find(s => s.id === showConfigModal)?.title}
+              </h3>
+              <button onClick={() => setShowConfigModal(null)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100">
+                <X size={18} className="text-gray-400" />
+              </button>
+            </div>
+            <p className="text-sm text-[#6B7280] mb-4">
+              {nextSteps.find(s => s.id === showConfigModal)?.desc}
+            </p>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium text-[#6B7280] block mb-1">Threshold value</label>
+                <input type="text" defaultValue="2000ms" className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-[#6B7280] block mb-1">Notification channel</label>
+                <select className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200">
+                  <option>Email</option>
+                  <option>Slack</option>
+                  <option>Webhook</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => { handleCompleteStep(showConfigModal); setShowConfigModal(null); }}
+                className="flex-1 py-2.5 bg-[#2F5CFF] text-white rounded-xl text-sm font-medium hover:bg-blue-600 transition-all active:scale-[0.98]"
+              >
+                Save & Complete
+              </button>
+              <button
+                onClick={() => setShowConfigModal(null)}
+                className="px-4 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-200 transition-all"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -308,13 +605,13 @@ function StatCard({ icon: Icon, value, label, sub, color }: { icon: any; value: 
     amber: 'bg-amber-50 text-amber-500',
   };
   return (
-    <div className="p-4 rounded-2xl border border-gray-100 hover:shadow-md transition-all">
+    <div className="p-4 rounded-2xl border border-gray-100 hover:shadow-md transition-all min-w-0">
       <div className={`w-8 h-8 rounded-lg ${colors[color]} flex items-center justify-center mb-3`}>
         <Icon size={16} />
       </div>
-      <p className="text-2xl font-bold text-[#111]">{value}</p>
+      <p className="text-2xl font-bold text-[#111] truncate">{value}</p>
       <p className="text-xs text-[#6B7280] font-medium">{label}</p>
-      <p className="text-[10px] text-[#9CA3AF] mt-1">{sub}</p>
+      <p className="text-[10px] text-[#9CA3AF] mt-1 truncate">{sub}</p>
     </div>
   );
 }

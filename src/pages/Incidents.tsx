@@ -125,10 +125,10 @@ export default function Incidents() {
     const AgentIcon = selectedIncident.agentIcon;
 
     return (
-      <div className="max-w-[1600px] mx-auto space-y-6">
+      <div className="space-y-6 w-full">
         <button
           onClick={() => setSelectedIncident(null)}
-          className="inline-flex items-center gap-2 text-sm text-[#6B7280] hover:text-[#111] transition-all"
+          className="inline-flex items-center gap-2 text-sm text-[#6B7280] hover:text-[#111] active:scale-95 transition-all"
         >
           <ChevronRight size={14} className="rotate-180" />
           Back to incidents
@@ -206,8 +206,8 @@ export default function Incidents() {
   }
 
   return (
-    <div className="max-w-[1600px] mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 w-full">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#111]">Incidents</h1>
           <p className="text-sm text-[#6B7280] mt-1">Track and resolve issues in your agent system</p>
@@ -221,20 +221,20 @@ export default function Incidents() {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 min-w-0">
           <p className="text-2xl font-bold text-red-600">2</p>
           <p className="text-xs text-[#6B7280]">Open</p>
         </div>
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 min-w-0">
           <p className="text-2xl font-bold text-amber-600">1</p>
           <p className="text-xs text-[#6B7280]">Investigating</p>
         </div>
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 min-w-0">
           <p className="text-2xl font-bold text-green-600">2</p>
           <p className="text-xs text-[#6B7280]">Resolved today</p>
         </div>
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 min-w-0">
           <p className="text-2xl font-bold text-[#111]">18m</p>
           <p className="text-xs text-[#6B7280]">Avg resolution</p>
         </div>

@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import TopNav from './components/TopNav';
 import Overview from './pages/Overview';
 import Workflows from './pages/Workflows';
+import WorkflowDetail from './pages/WorkflowDetail';
 import LiveMap from './pages/LiveMap';
 import Traces from './pages/Traces';
 import Incidents from './pages/Incidents';
@@ -41,17 +41,20 @@ function Layout() {
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#F3F3F4]">
       <Sidebar activePage={activePage} setActivePage={setActivePage} />
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col overflow-hidden min-w-0">
         <TopNav activePage={activePage} setActivePage={setActivePage} />
-        <main className="flex-1 overflow-y-auto p-4 lg:p-8">
-          <Routes>
-            <Route path="/" element={<Overview />} />
-            <Route path="/workflows" element={<Workflows />} />
-            <Route path="/livemap" element={<LiveMap />} />
-            <Route path="/traces" element={<Traces />} />
-            <Route path="/incidents" element={<Incidents />} />
-            <Route path="/insights" element={<Insights />} />
-          </Routes>
+        <main className="flex-1 overflow-y-auto overflow-x-hidden">
+          <div className="w-full max-w-[1600px] mx-auto px-4 py-6 lg:px-8 lg:py-8">
+            <Routes>
+              <Route path="/" element={<Overview />} />
+              <Route path="/workflows" element={<Workflows />} />
+              <Route path="/workflows/:id" element={<WorkflowDetail />} />
+              <Route path="/livemap" element={<LiveMap />} />
+              <Route path="/traces" element={<Traces />} />
+              <Route path="/incidents" element={<Incidents />} />
+              <Route path="/insights" element={<Insights />} />
+            </Routes>
+          </div>
         </main>
       </div>
     </div>

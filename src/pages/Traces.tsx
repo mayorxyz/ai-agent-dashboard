@@ -119,8 +119,8 @@ export default function Traces() {
     : traces.filter(t => t.status === filterStatus);
 
   return (
-    <div className="max-w-[1600px] mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 w-full">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#111]">Traces</h1>
           <p className="text-sm text-[#6B7280] mt-1">Execution traces across your agent system</p>

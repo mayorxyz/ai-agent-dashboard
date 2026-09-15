@@ -49,8 +49,8 @@ export default function LiveMap() {
   };
 
   return (
-    <div className="max-w-[1600px] mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 w-full">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#111]">Live Map</h1>
           <p className="text-sm text-[#6B7280] mt-1">Real-time agent communication graph</p>
@@ -63,9 +63,9 @@ export default function LiveMap() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 w-full">
         {/* Main canvas */}
-        <div className="xl:col-span-8 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-h-[500px] relative overflow-hidden">
+        <div className="xl:col-span-8 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-h-[500px] relative overflow-hidden min-w-0">
           <svg className="absolute inset-0 w-full h-full" viewBox="0 0 800 520">
             {/* Edges */}
             {edges.map((edge, i) => {
@@ -183,7 +183,7 @@ export default function LiveMap() {
         </div>
 
         {/* Side panel */}
-        <div className="xl:col-span-4 space-y-4">
+        <div className="xl:col-span-4 space-y-4 min-w-0">
           {/* Active Traces */}
           <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-4">
