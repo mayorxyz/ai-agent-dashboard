@@ -27,6 +27,7 @@ import {
   Area,
   AreaChart,
 } from 'recharts';
+import { useTheme } from '../contexts/ThemeContext';
 
 const colorMap: Record<string, { bg: string; text: string; icon: string; border: string }> = {
   green: { bg: 'bg-green-50', text: 'text-green-700', icon: 'text-green-500', border: 'border-green-200' },
@@ -120,6 +121,7 @@ const successChartData = [
 ];
 
 export default function WorkflowDetail() {
+  const { isDark } = useTheme();
   const navigate = useNavigate();
   const { id } = useParams();
   const workflow = workflowsData[Number(id)] || workflowsData[1];
@@ -127,7 +129,7 @@ export default function WorkflowDetail() {
   if (!workflow) {
     return (
       <div className="text-center py-20">
-        <p className="text-[#6B7280]">Workflow not found</p>
+        <p className={isDark ? 'text-gray-400' : 'text-[#6B7280]'}>Workflow not found</p>
         <button onClick={() => navigate('/workflows')} className="mt-4 text-[#2F5CFF] text-sm font-medium hover:underline">
           ← Back to workflows
         </button>
@@ -140,18 +142,22 @@ export default function WorkflowDetail() {
       {/* Back button */}
       <button
         onClick={() => navigate('/workflows')}
-        className="inline-flex items-center gap-2 text-sm text-[#6B7280] hover:text-[#111] transition-all active:scale-95"
+        className={`inline-flex items-center gap-2 text-sm transition-all active:scale-95 ${
+          isDark ? 'text-gray-400 hover:text-gray-200' : 'text-[#6B7280] hover:text-[#111]'
+        }`}
       >
         <ArrowLeft size={14} />
         Back to workflows
       </button>
 
       {/* Header */}
-      <div className="bg-white rounded-3xl p-6 lg:p-8 shadow-sm border border-gray-100">
+      <div className={`rounded-3xl p-6 lg:p-8 shadow-sm border ${
+        isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+      }`}>
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
           <div className="min-w-0">
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-xl lg:text-2xl font-bold text-[#111] truncate">{workflow.name}</h1>
+              <h1 className={`text-xl lg:text-2xl font-bold truncate ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>{workflow.name}</h1>
               <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
                 workflow.status === 'active' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'
               }`}>
@@ -159,7 +165,7 @@ export default function WorkflowDetail() {
                 {workflow.status === 'active' ? 'Active' : 'Warning'}
               </span>
             </div>
-            <p className="text-sm text-[#6B7280]">{workflow.description}</p>
+            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>{workflow.description}</p>
           </div>
           <button className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#2F5CFF] text-white rounded-full text-sm font-medium hover:bg-blue-600 active:bg-blue-700 transition-all shadow-sm active:scale-[0.98] flex-shrink-0">
             <Play size={14} />
@@ -179,12 +185,12 @@ export default function WorkflowDetail() {
                     <div className={`w-14 h-14 lg:w-16 lg:h-16 rounded-2xl ${colors.bg} border ${colors.border} flex items-center justify-center shadow-sm hover:shadow-md transition-all`}>
                       <Icon size={22} className={colors.icon} />
                     </div>
-                    <span className="text-xs font-medium text-[#111] text-center">{agent.name}</span>
+                    <span className={`text-xs font-medium text-center ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>{agent.name}</span>
                   </div>
                   {i < workflow.agents.length - 1 && (
                     <div className="flex items-center">
-                      <div className="w-8 lg:w-12 h-px bg-gray-200" />
-                      <ArrowRight size={14} className="text-gray-300 -ml-1" />
+                      <div className={`w-8 lg:w-12 h-px ${isDark ? 'bg-[#27272A]' : 'bg-gray-200'}`} />
+                      <ArrowRight size={14} className={isDark ? 'text-gray-600 -ml-1' : 'text-gray-300 -ml-1'} />
                     </div>
                   )}
                 </div>
@@ -196,42 +202,52 @@ export default function WorkflowDetail() {
 
       {/* Stats row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0 overflow-hidden">
+        <div className={`rounded-2xl p-5 shadow-sm border min-w-0 overflow-hidden ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
           <div className="flex items-center gap-2 mb-2">
             <Activity size={16} className="text-blue-500 flex-shrink-0" />
-            <span className="text-xs text-[#6B7280] truncate">Total Runs</span>
+            <span className={`text-xs truncate ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>Total Runs</span>
           </div>
-          <p className="text-2xl font-bold text-[#111] truncate">{workflow.runs.toLocaleString()}</p>
+          <p className={`text-2xl font-bold truncate ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>{workflow.runs.toLocaleString()}</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0 overflow-hidden">
+        <div className={`rounded-2xl p-5 shadow-sm border min-w-0 overflow-hidden ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle2 size={16} className="text-green-500 flex-shrink-0" />
-            <span className="text-xs text-[#6B7280] truncate">Success Rate</span>
+            <span className={`text-xs truncate ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>Success Rate</span>
           </div>
           <p className="text-2xl font-bold text-green-600 truncate">{workflow.successRate}%</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0 overflow-hidden">
+        <div className={`rounded-2xl p-5 shadow-sm border min-w-0 overflow-hidden ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
           <div className="flex items-center gap-2 mb-2">
             <Clock size={16} className="text-purple-500 flex-shrink-0" />
-            <span className="text-xs text-[#6B7280] truncate">Avg Duration</span>
+            <span className={`text-xs truncate ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>Avg Duration</span>
           </div>
-          <p className="text-2xl font-bold text-[#111] truncate">{workflow.avgDuration}</p>
+          <p className={`text-2xl font-bold truncate ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>{workflow.avgDuration}</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0 overflow-hidden">
+        <div className={`rounded-2xl p-5 shadow-sm border min-w-0 overflow-hidden ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
           <div className="flex items-center gap-2 mb-2">
             <Zap size={16} className="text-amber-500 flex-shrink-0" />
-            <span className="text-xs text-[#6B7280] truncate">Last Run</span>
+            <span className={`text-xs truncate ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>Last Run</span>
           </div>
-          <p className="text-2xl font-bold text-[#111] truncate">{workflow.lastRun}</p>
+          <p className={`text-2xl font-bold truncate ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>{workflow.lastRun}</p>
         </div>
       </div>
 
       {/* Charts + Run History */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
         {/* Success rate chart */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-w-0">
-          <h2 className="text-base font-semibold text-[#111] mb-1">Success Rate Over Time</h2>
-          <p className="text-xs text-[#6B7280] mb-4">Last 2 hours</p>
+        <div className={`rounded-3xl p-6 shadow-sm border min-w-0 ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
+          <h2 className={`text-base font-semibold mb-1 ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>Success Rate Over Time</h2>
+          <p className={`text-xs mb-4 ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>Last 2 hours</p>
           <ResponsiveContainer width="100%" height={200}>
             <AreaChart data={successChartData}>
               <defs>
@@ -240,36 +256,48 @@ export default function WorkflowDetail() {
                   <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
-              <XAxis dataKey="time" tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
-              <YAxis domain={[88, 100]} tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} unit="%" />
-              <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: '12px' }} formatter={(v: number) => [`${v}%`, 'Success']} />
+              <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#27272A' : '#F3F4F6'} />
+              <XAxis dataKey="time" tick={{ fontSize: 10, fill: isDark ? '#9CA3AF' : '#9CA3AF' }} axisLine={false} tickLine={false} />
+              <YAxis domain={[88, 100]} tick={{ fontSize: 10, fill: isDark ? '#9CA3AF' : '#9CA3AF' }} axisLine={false} tickLine={false} unit="%" />
+              <Tooltip 
+                contentStyle={{ 
+                  borderRadius: '12px', 
+                  border: `1px solid ${isDark ? '#27272A' : '#E5E7EB'}`, 
+                  backgroundColor: isDark ? '#18181B' : '#FFFFFF',
+                  fontSize: '12px' 
+                }} 
+                formatter={(v: number) => [`${v}%`, 'Success']} 
+              />
               <Area type="monotone" dataKey="rate" stroke="#10B981" strokeWidth={2} fill="url(#successGrad)" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
 
         {/* Run history */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-w-0">
-          <h2 className="text-base font-semibold text-[#111] mb-1">Recent Runs</h2>
-          <p className="text-xs text-[#6B7280] mb-4">Latest executions</p>
+        <div className={`rounded-3xl p-6 shadow-sm border min-w-0 ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
+          <h2 className={`text-base font-semibold mb-1 ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>Recent Runs</h2>
+          <p className={`text-xs mb-4 ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>Latest executions</p>
           <div className="space-y-2 max-h-[220px] overflow-y-auto">
             {runHistory.map((run, i) => (
-              <div key={i} className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-all cursor-pointer">
+              <div key={i} className={`flex items-center justify-between p-3 rounded-xl transition-all cursor-pointer ${
+                isDark ? 'hover:bg-[#1F1F23]' : 'hover:bg-gray-50'
+              }`}>
                 <div className="flex items-center gap-3">
                   <div className={`w-2 h-2 rounded-full ${
                     run.status === 'success' ? 'bg-green-500' : run.status === 'error' ? 'bg-red-500' : 'bg-amber-500'
                   }`} />
-                  <span className="text-sm text-[#111] font-medium">Run #{runHistory.length - i}</span>
+                  <span className={`text-sm font-medium ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>Run #{runHistory.length - i}</span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="text-xs text-[#6B7280]">{run.duration}</span>
+                  <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>{run.duration}</span>
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                     run.status === 'success' ? 'bg-green-50 text-green-700' : run.status === 'error' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700'
                   }`}>
                     {run.status}
                   </span>
-                  <span className="text-xs text-[#9CA3AF]">{run.time}</span>
+                  <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-[#9CA3AF]'}`}>{run.time}</span>
                 </div>
               </div>
             ))}
