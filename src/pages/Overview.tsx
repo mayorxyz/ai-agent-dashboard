@@ -23,8 +23,12 @@ import {
   ChevronDown,
   X,
   Check,
+  AlertCircle,
+  TrendingUp,
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+import Sparkline from '../components/Sparkline';
+import { sparklineData, anomalyFeed } from '../data/mockData';
 import type { Page } from '../App';
 
 interface OverviewProps {
@@ -307,6 +311,10 @@ export default function Overview() {
             {filteredAgents.map((agent) => {
               const colors = colorMap[agent.color];
               const Icon = agent.icon;
+              const sparklineColor = colors.icon.replace('text-', '').includes('green') ? '#10B981' :
+                                     colors.icon.replace('text-', '').includes('purple') ? '#8B5CF6' :
+                                     colors.icon.replace('text-', '').includes('blue') ? '#3B82F6' :
+                                     colors.icon.replace('text-', '').includes('amber') ? '#F59E0B' : '#EF4444';
               return (
                 <div
                   key={agent.name}
@@ -321,6 +329,12 @@ export default function Overview() {
                     <p className={`text-sm font-semibold truncate ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>{agent.name}</p>
                     <p className={`text-xs truncate ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>{agent.role}</p>
                   </div>
+                  <Sparkline 
+                    data={sparklineData[agent.name as keyof typeof sparklineData] || []} 
+                    color={sparklineColor}
+                    width={60}
+                    height={20}
+                  />
                   <span className={`text-xs font-medium px-2 py-1 rounded-full flex-shrink-0 ${isDark ? 'text-gray-400 bg-[#1F1F23]' : 'text-[#6B7280] bg-gray-50'}`}>
                     {agent.calls}
                   </span>
@@ -586,6 +600,65 @@ export default function Overview() {
               </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Anomaly Feed */}
+      <div className={`rounded-3xl p-6 shadow-sm border w-full transition-colors duration-300 ${
+        isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+      }`}>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className={`text-lg font-semibold ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>Anomalies</h2>
+          <span className={`text-xs px-2 py-1 rounded-full ${isDark ? 'text-gray-400 bg-[#1F1F23]' : 'text-[#6B7280] bg-gray-50'}`}>
+            {anomalyFeed.length} detected
+          </span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          {anomalyFeed.map((anomaly) => {
+            const severityColors = {
+              high: { bg: 'bg-red-50', text: 'text-red-600', dot: 'bg-red-500', darkBg: 'bg-red-900/20', darkText: 'text-red-400' },
+              medium: { bg: 'bg-amber-50', text: 'text-amber-600', dot: 'bg-amber-500', darkBg: 'bg-amber-900/20', darkText: 'text-amber-400' },
+              low: { bg: 'bg-blue-50', text: 'text-blue-600', dot: 'bg-blue-500', darkBg: 'bg-blue-900/20', darkText: 'text-blue-400' },
+            };
+            const colors = severityColors[anomaly.severity as keyof typeof severityColors];
+            const typeIcons = {
+              latency_spike: Zap,
+              error_rate: AlertCircle,
+              volume_anomaly: TrendingUp,
+              routing_issue: GitBranch,
+            };
+            const TypeIcon = typeIcons[anomaly.type as keyof typeof typeIcons] || Zap;
+            
+            return (
+              <div
+                key={anomaly.id}
+                className={`p-4 rounded-2xl border transition-all hover:shadow-md cursor-pointer ${
+                  isDark 
+                    ? `border-[#1F1F23] hover:border-[#27272A] ${colors.darkBg}` 
+                    : `border-gray-100 hover:border-gray-200 ${colors.bg}`
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                    isDark ? colors.darkBg : colors.bg
+                  }`}>
+                    <TypeIcon size={16} className={isDark ? colors.darkText : colors.text} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isDark ? colors.dot : colors.dot}`} />
+                      <p className={`text-sm font-semibold truncate ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>
+                        {anomaly.description}
+                      </p>
+                    </div>
+                    <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>
+                      {anomaly.timestamp}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 

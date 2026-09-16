@@ -11,6 +11,7 @@ import {
   ScrollText,
   AlertTriangle,
   BarChart3,
+  DollarSign,
   User,
   Settings,
   LogOut,
@@ -34,6 +35,8 @@ const tabs: { label: string; page: Page; icon: any }[] = [
   { label: 'Traces', page: 'traces', icon: ScrollText },
   { label: 'Incidents', page: 'incidents', icon: AlertTriangle },
   { label: 'Insights', page: 'insights', icon: BarChart3 },
+  { label: 'Cost', page: 'cost', icon: DollarSign },
+  { label: 'Compare', page: 'compare', icon: GitBranch },
 ];
 
 const initialNotifications = [

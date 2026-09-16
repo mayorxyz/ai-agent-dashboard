@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import { useTheme } from '../contexts/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 import {
   DollarSign,
   Clock,
@@ -5,277 +8,409 @@ import {
   Zap,
   ArrowUpRight,
   ArrowDownRight,
-  Lightbulb,
+  Activity,
+  CheckCircle2,
 } from 'lucide-react';
 import {
   LineChart,
   Line,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Area,
-  AreaChart,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
 } from 'recharts';
-
-const latencyData = [
-  { time: '09:00', value: 1.2 },
-  { time: '09:15', value: 1.4 },
-  { time: '09:30', value: 1.1 },
-  { time: '09:45', value: 1.8 },
-  { time: '10:00', value: 2.1 },
-  { time: '10:15', value: 1.6 },
-  { time: '10:30', value: 1.3 },
-  { time: '10:45', value: 1.5 },
-];
-
-const costData = [
-  { agent: 'Researcher', cost: 12.4 },
-  { agent: 'Supervisor', cost: 8.2 },
-  { agent: 'DataFetcher', cost: 18.7 },
-  { agent: 'Validator', cost: 5.3 },
-  { agent: 'Responder', cost: 9.8 },
-];
-
-const errorRateData = [
-  { time: '09:00', rate: 0.5 },
-  { time: '09:15', rate: 0.8 },
-  { time: '09:30', rate: 0.3 },
-  { time: '09:45', rate: 1.2 },
-  { time: '10:00', rate: 2.1 },
-  { time: '10:15', rate: 1.5 },
-  { time: '10:30', rate: 0.9 },
-  { time: '10:45', rate: 0.6 },
-];
-
-const insights = [
-  {
-    type: 'anomaly',
-    title: 'Unusual latency spike detected',
-    description: 'DataFetcher latency increased 3x between 09:45-10:00. Possible external API degradation.',
-    time: '25 min ago',
-    icon: AlertTriangle,
-    color: 'amber',
-  },
-  {
-    type: 'suggestion',
-    title: 'Consider scaling Researcher agents',
-    description: 'Researcher queue depth has been consistently above 80% for the last hour.',
-    time: '1 hour ago',
-    icon: Lightbulb,
-    color: 'blue',
-  },
-  {
-    type: 'optimization',
-    title: 'Cost optimization opportunity',
-    description: 'Switching DataFetcher to a smaller model could save ~$4.20/day with minimal quality impact.',
-    time: '2 hours ago',
-    icon: DollarSign,
-    color: 'green',
-  },
-  {
-    type: 'anomaly',
-    title: 'Error rate above threshold',
-    description: 'Validator error rate exceeded 2% threshold at 10:00. Schema mismatch suspected.',
-    time: '45 min ago',
-    icon: Zap,
-    color: 'red',
-  },
-];
-
-const insightColors: Record<string, { bg: string; text: string; icon: string }> = {
-  amber: { bg: 'bg-amber-50', text: 'text-amber-700', icon: 'text-amber-500' },
-  blue: { bg: 'bg-blue-50', text: 'text-blue-700', icon: 'text-blue-500' },
-  green: { bg: 'bg-green-50', text: 'text-green-700', icon: 'text-green-500' },
-  red: { bg: 'bg-red-50', text: 'text-red-700', icon: 'text-red-500' },
-};
+import { insightsData, agents } from '../data/mockData';
 
 export default function Insights() {
+  const { isDark } = useTheme();
+  const navigate = useNavigate();
+  const [hiddenAgents, setHiddenAgents] = useState<Set<string>>(new Set());
+
+  const toggleAgent = (agentName: string) => {
+    const newHidden = new Set(hiddenAgents);
+    if (newHidden.has(agentName)) {
+      newHidden.delete(agentName);
+    } else {
+      newHidden.add(agentName);
+    }
+    setHiddenAgents(newHidden);
+  };
+
+  const agentColors: Record<string, string> = {
+    Researcher: '#10B981',
+    Supervisor: '#8B5CF6',
+    DataFetcher: '#3B82F6',
+    Validator: '#F59E0B',
+    Responder: '#EF4444',
+  };
+
+  const maxHeatmapValue = Math.max(
+    ...insightsData.heatmapData.flatMap(row => 
+      agents.map(agent => row[agent.name as keyof typeof row] as number)
+    )
+  );
+
+  const getHeatmapColor = (value: number) => {
+    const intensity = value / maxHeatmapValue;
+    if (isDark) {
+      return `rgba(47, 92, 255, ${0.2 + intensity * 0.8})`;
+    }
+    return `rgba(47, 92, 255, ${0.1 + intensity * 0.9})`;
+  };
+
   return (
     <div className="space-y-6 w-full">
+      {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#111]">Insights</h1>
-          <p className="text-sm text-[#6B7280] mt-1">Analytics and AI-powered recommendations</p>
+          <h1 className={`text-2xl font-bold ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>
+            Insights & Analytics
+          </h1>
+          <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>
+            Performance metrics and AI-powered analysis
+          </p>
         </div>
       </div>
 
-      {/* Top stat cards */}
+      {/* Top Stat Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0 overflow-hidden">
+        <div className={`rounded-2xl p-5 shadow-sm border min-w-0 overflow-hidden ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
           <div className="flex items-center justify-between mb-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-              <Clock size={18} className="text-blue-500" />
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
+              isDark ? 'bg-blue-900/30' : 'bg-blue-50'
+            }`}>
+              <Clock size={18} className={isDark ? 'text-blue-400' : 'text-blue-500'} />
             </div>
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap">
+            <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap ${
+              isDark ? 'text-red-400 bg-red-900/30' : 'text-red-600 bg-red-50'
+            }`}>
               <ArrowUpRight size={12} className="flex-shrink-0" />
               +12%
             </span>
           </div>
-          <p className="text-2xl font-bold text-[#111] truncate">1.52s</p>
-          <p className="text-xs text-[#6B7280] truncate">Avg latency</p>
+          <p className={`text-2xl font-bold truncate ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>
+            {insightsData.avgLatency}s
+          </p>
+          <p className={`text-xs truncate ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>
+            Avg latency
+          </p>
         </div>
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0 overflow-hidden">
+
+        <div className={`rounded-2xl p-5 shadow-sm border min-w-0 overflow-hidden ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
           <div className="flex items-center justify-between mb-3">
-            <div className="w-9 h-9 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0">
-              <DollarSign size={18} className="text-green-500" />
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
+              isDark ? 'bg-red-900/30' : 'bg-red-50'
+            }`}>
+              <AlertTriangle size={18} className={isDark ? 'text-red-400' : 'text-red-500'} />
             </div>
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap">
-              <ArrowDownRight size={12} className="flex-shrink-0" />
-              -8%
-            </span>
-          </div>
-          <p className="text-2xl font-bold text-[#111] truncate">$54.40</p>
-          <p className="text-xs text-[#6B7280] truncate">Cost today</p>
-        </div>
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0 overflow-hidden">
-          <div className="flex items-center justify-between mb-3">
-            <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
-              <AlertTriangle size={18} className="text-red-500" />
-            </div>
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap">
+            <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap ${
+              isDark ? 'text-red-400 bg-red-900/30' : 'text-red-600 bg-red-50'
+            }`}>
               <ArrowUpRight size={12} className="flex-shrink-0" />
               +0.3%
             </span>
           </div>
-          <p className="text-2xl font-bold text-[#111] truncate">0.9%</p>
-          <p className="text-xs text-[#6B7280] truncate">Error rate</p>
+          <p className={`text-2xl font-bold truncate ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>
+            {insightsData.errorRate}%
+          </p>
+          <p className={`text-xs truncate ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>
+            Error rate
+          </p>
         </div>
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0 overflow-hidden">
+
+        <div className={`rounded-2xl p-5 shadow-sm border min-w-0 overflow-hidden ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
           <div className="flex items-center justify-between mb-3">
-            <div className="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0">
-              <Zap size={18} className="text-purple-500" />
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
+              isDark ? 'bg-green-900/30' : 'bg-green-50'
+            }`}>
+              <DollarSign size={18} className={isDark ? 'text-green-400' : 'text-green-500'} />
             </div>
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap">
-              <ArrowUpRight size={12} className="flex-shrink-0" />
-              +5%
+            <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap ${
+              isDark ? 'text-green-400 bg-green-900/30' : 'text-green-600 bg-green-50'
+            }`}>
+              <ArrowDownRight size={12} className="flex-shrink-0" />
+              -8%
             </span>
           </div>
-          <p className="text-2xl font-bold text-[#111] truncate">412</p>
-          <p className="text-xs text-[#6B7280] truncate">Events / hour</p>
+          <p className={`text-2xl font-bold truncate ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>
+            ${insightsData.totalCost}
+          </p>
+          <p className={`text-xs truncate ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>
+            Total cost
+          </p>
+        </div>
+
+        <div className={`rounded-2xl p-5 shadow-sm border min-w-0 overflow-hidden ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
+          <div className="flex items-center justify-between mb-3">
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
+              isDark ? 'bg-purple-900/30' : 'bg-purple-50'
+            }`}>
+              <Activity size={18} className={isDark ? 'text-purple-400' : 'text-purple-500'} />
+            </div>
+            <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap ${
+              isDark ? 'text-green-400 bg-green-900/30' : 'text-green-600 bg-green-50'
+            }`}>
+              <CheckCircle2 size={12} className="flex-shrink-0" />
+              Stable
+            </span>
+          </div>
+          <p className={`text-2xl font-bold truncate ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>
+            {insightsData.uptime}%
+          </p>
+          <p className={`text-xs truncate ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>
+            Uptime
+          </p>
         </div>
       </div>
 
-      {/* Charts */}
+      {/* Line Chart: Latency Over Time */}
+      <div className={`rounded-3xl p-6 shadow-sm border min-w-0 ${
+        isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+      }`}>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className={`text-base font-semibold ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>
+              Latency Over Time
+            </h2>
+            <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>
+              Per agent, last 24 hours
+            </p>
+          </div>
+        </div>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={insightsData.latencyOverTime}>
+            <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#27272A' : '#F3F4F6'} />
+            <XAxis 
+              dataKey="time" 
+              tick={{ fontSize: 10, fill: isDark ? '#9CA3AF' : '#9CA3AF' }} 
+              axisLine={false} 
+              tickLine={false}
+            />
+            <YAxis 
+              tick={{ fontSize: 10, fill: isDark ? '#9CA3AF' : '#9CA3AF' }} 
+              axisLine={false} 
+              tickLine={false}
+              unit="s"
+            />
+            <Tooltip
+              contentStyle={{
+                borderRadius: '12px',
+                border: `1px solid ${isDark ? '#27272A' : '#E5E7EB'}`,
+                backgroundColor: isDark ? '#18181B' : '#FFFFFF',
+                fontSize: '12px',
+              }}
+              formatter={(value: number) => [`${value}s`, '']}
+            />
+            {agents.map((agent) => (
+              <Line
+                key={agent.name}
+                type="monotone"
+                dataKey={agent.name}
+                stroke={agentColors[agent.name]}
+                strokeWidth={2}
+                dot={{ fill: agentColors[agent.name], r: 3 }}
+                hide={hiddenAgents.has(agent.name)}
+              />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+        {/* Custom Legend */}
+        <div className="flex flex-wrap gap-3 mt-4 justify-center">
+          {agents.map((agent) => (
+            <button
+              key={agent.name}
+              onClick={() => toggleAgent(agent.name)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                hiddenAgents.has(agent.name)
+                  ? isDark ? 'bg-[#1F1F23] text-gray-500' : 'bg-gray-100 text-gray-400'
+                  : isDark ? 'bg-[#1F1F23] text-gray-200' : 'bg-gray-50 text-gray-700'
+              }`}
+            >
+              <div
+                className="w-3 h-3 rounded-full"
+                style={{
+                  backgroundColor: agentColors[agent.name],
+                  opacity: hiddenAgents.has(agent.name) ? 0.3 : 1,
+                }}
+              />
+              {agent.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Charts Grid: Donut + Heatmap */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
-        {/* Latency chart */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-w-0">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-base font-semibold text-[#111]">Latency Over Time</h2>
-              <p className="text-xs text-[#6B7280]">Average response time per 15-min window</p>
-            </div>
-            <span className="text-xs text-[#6B7280] bg-gray-50 px-2.5 py-1 rounded-full">Last 2h</span>
-          </div>
-          <ResponsiveContainer width="100%" height={200}>
-            <AreaChart data={latencyData}>
-              <defs>
-                <linearGradient id="latencyGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#2F5CFF" stopOpacity={0.1} />
-                  <stop offset="95%" stopColor="#2F5CFF" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
-              <XAxis dataKey="time" tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} unit="s" />
+        {/* Donut Chart: Error Distribution */}
+        <div className={`rounded-3xl p-6 shadow-sm border min-w-0 ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
+          <h2 className={`text-base font-semibold mb-1 ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>
+            Error Distribution
+          </h2>
+          <p className={`text-xs mb-6 ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>
+            By agent
+          </p>
+          <ResponsiveContainer width="100%" height={250}>
+            <PieChart>
+              <Pie
+                data={insightsData.errorDistribution}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={2}
+                dataKey="errors"
+              >
+                {insightsData.errorDistribution.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={agentColors[entry.agent]} />
+                ))}
+              </Pie>
               <Tooltip
-                contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: '12px' }}
-                formatter={(value: number) => [`${value}s`, 'Latency']}
+                contentStyle={{
+                  borderRadius: '12px',
+                  border: `1px solid ${isDark ? '#27272A' : '#E5E7EB'}`,
+                  backgroundColor: isDark ? '#18181B' : '#FFFFFF',
+                  fontSize: '12px',
+                }}
+                formatter={(value: number, name: string, props: any) => [
+                  `${value} errors (${props.payload.percentage}%)`,
+                  props.payload.agent,
+                ]}
               />
-              <Area type="monotone" dataKey="value" stroke="#2F5CFF" strokeWidth={2} fill="url(#latencyGradient)" />
-            </AreaChart>
+              <Legend 
+                verticalAlign="bottom" 
+                height={36}
+                formatter={(value: string) => (
+                  <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>{value}</span>
+                )}
+              />
+            </PieChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Cost per agent */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-w-0">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-base font-semibold text-[#111]">Cost per Agent</h2>
-              <p className="text-xs text-[#6B7280]">Today's spend by agent</p>
-            </div>
-            <span className="text-xs text-[#6B7280] bg-gray-50 px-2.5 py-1 rounded-full">Total: $54.40</span>
-          </div>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={costData} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" horizontal={false} />
-              <XAxis type="number" tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} unit="$" />
-              <YAxis dataKey="agent" type="category" tick={{ fontSize: 11, fill: '#6B7280' }} axisLine={false} tickLine={false} width={80} />
-              <Tooltip
-                contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: '12px' }}
-                formatter={(value: number) => [`$${value}`, 'Cost']}
-              />
-              <Bar dataKey="cost" fill="#2F5CFF" radius={[0, 6, 6, 0]} barSize={20} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Error rate */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-w-0">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-base font-semibold text-[#111]">Error Rate Trends</h2>
-              <p className="text-xs text-[#6B7280]">Percentage of failed executions</p>
-            </div>
-            <span className="text-xs text-[#6B7280] bg-gray-50 px-2.5 py-1 rounded-full">Last 2h</span>
-          </div>
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={errorRateData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
-              <XAxis dataKey="time" tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} unit="%" />
-              <Tooltip
-                contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: '12px' }}
-                formatter={(value: number) => [`${value}%`, 'Error Rate']}
-              />
-              <Line type="monotone" dataKey="rate" stroke="#EF4444" strokeWidth={2} dot={{ fill: '#EF4444', r: 3 }} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* AI Insights feed */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-w-0">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-base font-semibold text-[#111]">AI Insights</h2>
-              <p className="text-xs text-[#6B7280]">Auto-generated observations and recommendations</p>
-            </div>
-            <span className="inline-flex items-center gap-1 text-xs text-[#2F5CFF] font-medium bg-blue-50 px-2.5 py-1 rounded-full">
-              <Zap size={12} />
-              {insights.length} new
-            </span>
-          </div>
-          <div className="space-y-3 max-h-[240px] overflow-y-auto">
-            {insights.map((insight, i) => {
-              const colors = insightColors[insight.color];
-              const Icon = insight.icon;
-              return (
-                <div
-                  key={i}
-                  className="p-4 rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all cursor-pointer"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className={`w-8 h-8 rounded-lg ${colors.bg} flex items-center justify-center flex-shrink-0`}>
-                      <Icon size={16} className={colors.icon} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-sm font-semibold text-[#111]">{insight.title}</h3>
-                        <span className={`text-[10px] font-medium ${colors.text} ${colors.bg} px-1.5 py-0.5 rounded-full flex-shrink-0`}>
-                          {insight.type}
+        {/* Heatmap: Hour of Day vs Agent */}
+        <div className={`rounded-3xl p-6 shadow-sm border min-w-0 ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
+          <h2 className={`text-base font-semibold mb-1 ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>
+            Call Volume Heatmap
+          </h2>
+          <p className={`text-xs mb-6 ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>
+            Hour of day vs agent
+          </p>
+          <div className="overflow-x-auto">
+            <div className="min-w-[500px]">
+              {/* Header row */}
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-20 flex-shrink-0" />
+                {insightsData.heatmapData.map((row) => (
+                  <div key={row.hour} className="flex-1 text-center">
+                    <span className={`text-[10px] ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                      {row.hour}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              {/* Data rows */}
+              {agents.map((agent) => (
+                <div key={agent.name} className="flex items-center gap-2 mb-2">
+                  <div className={`w-20 flex-shrink-0 text-xs font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {agent.name}
+                  </div>
+                  {insightsData.heatmapData.map((row) => {
+                    const value = row[agent.name as keyof typeof row] as number;
+                    return (
+                      <div
+                        key={row.hour}
+                        className="flex-1 aspect-square rounded-lg flex items-center justify-center text-[9px] font-medium transition-all hover:scale-110 cursor-pointer"
+                        style={{ backgroundColor: getHeatmapColor(value) }}
+                        title={`${agent.name} at ${row.hour}: ${value} calls`}
+                      >
+                        <span className={isDark ? 'text-white/80' : 'text-white/90'}>
+                          {value}
                         </span>
                       </div>
-                      <p className="text-xs text-[#6B7280] leading-relaxed">{insight.description}</p>
-                      <p className="text-[10px] text-[#9CA3AF] mt-2">{insight.time}</p>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* AI-Flagged Anomalies Feed */}
+      <div className={`rounded-3xl p-6 shadow-sm border min-w-0 ${
+        isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+      }`}>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className={`text-base font-semibold ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>
+              AI-Flagged Anomalies
+            </h2>
+            <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>
+              Auto-detected issues requiring attention
+            </p>
+          </div>
+          <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${
+            isDark ? 'text-blue-400 bg-blue-900/30' : 'text-[#2F5CFF] bg-blue-50'
+          }`}>
+            <Zap size={12} />
+            {insightsData.anomalies.length} new
+          </span>
+        </div>
+        <div className="space-y-3">
+          {insightsData.anomalies.map((anomaly) => {
+            const severityColors = {
+              high: { dot: 'bg-red-500', bg: isDark ? 'bg-red-900/20' : 'bg-red-50', text: isDark ? 'text-red-400' : 'text-red-700' },
+              medium: { dot: 'bg-amber-500', bg: isDark ? 'bg-amber-900/20' : 'bg-amber-50', text: isDark ? 'text-amber-400' : 'text-amber-700' },
+              low: { dot: 'bg-blue-500', bg: isDark ? 'bg-blue-900/20' : 'bg-blue-50', text: isDark ? 'text-blue-400' : 'text-blue-700' },
+            };
+            const colors = severityColors[anomaly.severity as keyof typeof severityColors];
+            
+            return (
+              <div
+                key={anomaly.id}
+                className={`p-4 rounded-2xl border transition-all hover:shadow-md cursor-pointer ${
+                  isDark ? 'border-[#1F1F23] hover:border-[#27272A]' : 'border-gray-100 hover:border-gray-200'
+                } ${colors.bg}`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${colors.dot}`} />
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-medium mb-1 ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>
+                      {anomaly.description}
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>
+                        {anomaly.timestamp}
+                      </span>
+                      <button
+                        onClick={() => navigate('/traces')}
+                        className={`text-xs font-medium ${isDark ? 'text-blue-400 hover:text-blue-300' : 'text-[#2F5CFF] hover:text-blue-600'} hover:underline`}
+                      >
+                        View trace →
+                      </button>
                     </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

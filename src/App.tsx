@@ -9,8 +9,10 @@ import LiveMap from './pages/LiveMap';
 import Traces from './pages/Traces';
 import Incidents from './pages/Incidents';
 import Insights from './pages/Insights';
+import Cost from './pages/Cost';
+import Compare from './pages/Compare';
 
-export type Page = 'overview' | 'workflows' | 'livemap' | 'traces' | 'incidents' | 'insights';
+export type Page = 'overview' | 'workflows' | 'livemap' | 'traces' | 'incidents' | 'insights' | 'cost' | 'compare';
 
 const pathToPage: Record<string, Page> = {
   '/': 'overview',
@@ -19,6 +21,8 @@ const pathToPage: Record<string, Page> = {
   '/traces': 'traces',
   '/incidents': 'incidents',
   '/insights': 'insights',
+  '/cost': 'cost',
+  '/compare': 'compare',
 };
 
 const pageToPath: Record<Page, string> = {
@@ -28,6 +32,8 @@ const pageToPath: Record<Page, string> = {
   traces: '/traces',
   incidents: '/incidents',
   insights: '/insights',
+  cost: '/cost',
+  compare: '/compare',
 };
 
 function Layout() {
@@ -57,6 +63,8 @@ function Layout() {
               <Route path="/traces" element={<Traces />} />
               <Route path="/incidents" element={<Incidents />} />
               <Route path="/insights" element={<Insights />} />
+              <Route path="/cost" element={<Cost />} />
+              <Route path="/compare" element={<Compare />} />
             </Routes>
           </div>
         </main>
