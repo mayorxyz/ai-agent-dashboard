@@ -18,6 +18,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { EmptyState } from '../components/EmptyState';
+import { useTheme } from '../contexts/ThemeContext';
 
 const colorMap: Record<string, { bg: string; text: string; icon: string; border: string }> = {
   green: { bg: 'bg-green-50', text: 'text-green-700', icon: 'text-green-500', border: 'border-green-200' },
@@ -108,6 +109,7 @@ const initialWorkflows: WorkflowType[] = [
 ];
 
 export default function Workflows() {
+  const { isDark } = useTheme();
   const navigate = useNavigate();
   const [workflows, setWorkflows] = useState<WorkflowType[]>(initialWorkflows);
   const [showNewModal, setShowNewModal] = useState(false);
@@ -151,8 +153,8 @@ export default function Workflows() {
     <div className="space-y-6 w-full">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#111]">Workflows</h1>
-          <p className="text-sm text-[#6B7280] mt-1">Monitor and manage your agent workflows</p>
+          <h1 className={`text-2xl font-bold ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>Workflows</h1>
+          <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>Monitor and manage your agent workflows</p>
         </div>
         <button
           onClick={() => setShowNewModal(true)}
@@ -178,16 +180,20 @@ export default function Workflows() {
         {workflows.map((wf) => (
           <div
             key={wf.id}
-            className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all cursor-pointer group min-w-0 overflow-hidden"
+            className={`rounded-3xl p-6 shadow-sm border transition-all cursor-pointer group min-w-0 overflow-hidden ${
+              isDark 
+                ? 'bg-[#111113] border-[#1F1F23] hover:border-[#27272A]' 
+                : 'bg-white border-gray-100 hover:border-gray-200'
+            }`}
             onClick={() => navigate(`/workflows/${wf.id}`)}
           >
             <div className="flex items-start justify-between mb-4 gap-3">
               <div className="flex-1 min-w-0">
-                <h3 className="text-base font-semibold text-[#111] group-hover:text-[#2F5CFF] transition-colors truncate">
+                <h3 className={`text-base font-semibold group-hover:text-[#2F5CFF] transition-colors truncate ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>
                   {wf.name}
                 </h3>
                 <div className="flex items-center gap-3 mt-1 flex-wrap">
-                  <span className="inline-flex items-center gap-1 text-xs text-[#6B7280] whitespace-nowrap">
+                  <span className={`inline-flex items-center gap-1 text-xs whitespace-nowrap ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>
                     <Clock size={12} className="flex-shrink-0" />
                     {wf.lastRun}
                   </span>
@@ -198,8 +204,8 @@ export default function Workflows() {
                 </div>
               </div>
               <div className="text-right flex-shrink-0">
-                <p className="text-lg font-bold text-[#111] whitespace-nowrap">{wf.successRate}%</p>
-                <p className="text-[10px] text-[#6B7280] whitespace-nowrap">success rate</p>
+                <p className={`text-lg font-bold whitespace-nowrap ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>{wf.successRate}%</p>
+                <p className={`text-[10px] whitespace-nowrap ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>success rate</p>
               </div>
             </div>
 
@@ -214,15 +220,15 @@ export default function Workflows() {
                       <Icon size={14} className={colors.icon} />
                     </div>
                     {i < wf.agents.length - 1 && (
-                      <ArrowRight size={12} className="text-gray-300 mx-0.5" />
+                      <ArrowRight size={12} className={isDark ? 'text-gray-600 mx-0.5' : 'text-gray-300 mx-0.5'} />
                     )}
                   </div>
                 );
               })}
             </div>
 
-            <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
-              <span className="text-xs text-[#6B7280]">{wf.runs.toLocaleString()} runs</span>
+            <div className={`flex items-center justify-between mt-4 pt-4 border-t ${isDark ? 'border-[#1F1F23]' : 'border-gray-50'}`}>
+              <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>{wf.runs.toLocaleString()} runs</span>
               <span className="text-xs text-[#2F5CFF] font-medium opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
                 View details <ChevronRight size={12} />
               </span>
@@ -235,42 +241,50 @@ export default function Workflows() {
       {/* New Workflow Modal - Fix #7 */}
       {showNewModal && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4" onClick={() => setShowNewModal(false)}>
-          <div className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <div className={`rounded-3xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto ${
+            isDark ? 'bg-[#111113]' : 'bg-white'
+          }`} onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-[#111]">Create New Workflow</h3>
-              <button onClick={() => setShowNewModal(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 active:bg-gray-200 transition-all">
-                <X size={18} className="text-gray-400" />
+              <h3 className={`text-lg font-semibold ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>Create New Workflow</h3>
+              <button onClick={() => setShowNewModal(false)} className={`w-8 h-8 flex items-center justify-center rounded-full transition-all ${
+                isDark ? 'hover:bg-[#1F1F23] active:bg-[#27272A]' : 'hover:bg-gray-100 active:bg-gray-200'
+              }`}>
+                <X size={18} className={isDark ? 'text-gray-400' : 'text-gray-400'} />
               </button>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-[#111] block mb-1.5">Workflow Name</label>
+                <label className={`text-sm font-medium block mb-1.5 ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>Workflow Name</label>
                 <input
                   type="text"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder="e.g. Customer Onboarding Flow"
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#2F5CFF] transition-all"
+                  className={`w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#2F5CFF] transition-all ${
+                    isDark ? 'bg-[#1F1F23] border-[#27272A] text-gray-100 placeholder:text-gray-500' : 'bg-white border-gray-200 text-[#111] placeholder:text-gray-400'
+                  }`}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-[#111] block mb-1.5">Description</label>
+                <label className={`text-sm font-medium block mb-1.5 ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>Description</label>
                 <textarea
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
                   placeholder="What does this workflow do?"
                   rows={2}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#2F5CFF] transition-all resize-none"
+                  className={`w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#2F5CFF] transition-all resize-none ${
+                    isDark ? 'bg-[#1F1F23] border-[#27272A] text-gray-100 placeholder:text-gray-500' : 'bg-white border-gray-200 text-[#111] placeholder:text-gray-400'
+                  }`}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-[#111] block mb-1.5">Agent Chain</label>
-                <p className="text-xs text-[#6B7280] mb-2">Select agents in execution order</p>
+                <label className={`text-sm font-medium block mb-1.5 ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>Agent Chain</label>
+                <p className={`text-xs mb-2 ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>Select agents in execution order</p>
                 
                 {/* Selected agents */}
                 {selectedAgents.length > 0 && (
-                  <div className="flex items-center gap-1 flex-wrap mb-3 p-3 bg-gray-50 rounded-xl">
+                  <div className={`flex items-center gap-1 flex-wrap mb-3 p-3 rounded-xl ${isDark ? 'bg-[#1F1F23]' : 'bg-gray-50'}`}>
                     {selectedAgents.map((name, i) => {
                       const agent = availableAgents.find(a => a.name === name)!;
                       const colors = colorMap[agent.color];
@@ -286,7 +300,7 @@ export default function Workflows() {
                             <X size={10} />
                           </button>
                           {i < selectedAgents.length - 1 && (
-                            <ArrowRight size={12} className="text-gray-300 mx-1" />
+                            <ArrowRight size={12} className={isDark ? 'text-gray-600 mx-1' : 'text-gray-300 mx-1'} />
                           )}
                         </div>
                       );
@@ -303,16 +317,20 @@ export default function Workflows() {
                       <button
                         key={agent.name}
                         onClick={() => handleAddAgent(agent.name)}
-                        className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-all text-left"
+                        className={`flex items-center gap-3 p-3 rounded-xl border transition-all text-left ${
+                          isDark 
+                            ? 'border-[#1F1F23] hover:border-[#27272A] hover:bg-[#1F1F23] active:bg-[#27272A]' 
+                            : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50 active:bg-gray-100'
+                        }`}
                       >
                         <div className={`w-8 h-8 rounded-full ${colors.bg} flex items-center justify-center`}>
                           <Icon size={14} className={colors.icon} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-[#111]">{agent.name}</p>
-                          <p className="text-[10px] text-[#6B7280]">{agent.role}</p>
+                          <p className={`text-sm font-medium ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>{agent.name}</p>
+                          <p className={`text-[10px] ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>{agent.role}</p>
                         </div>
-                        <Plus size={16} className="text-gray-300" />
+                        <Plus size={16} className={isDark ? 'text-gray-600' : 'text-gray-300'} />
                       </button>
                     );
                   })}
@@ -320,7 +338,7 @@ export default function Workflows() {
               </div>
             </div>
 
-            <div className="flex gap-3 mt-6 pt-4 border-t border-gray-100">
+            <div className={`flex gap-3 mt-6 pt-4 border-t ${isDark ? 'border-[#1F1F23]' : 'border-gray-100'}`}>
               <button
                 onClick={handleCreateWorkflow}
                 disabled={!newName.trim() || selectedAgents.length === 0}
@@ -330,7 +348,11 @@ export default function Workflows() {
               </button>
               <button
                 onClick={() => setShowNewModal(false)}
-                className="px-4 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-200 active:bg-gray-300 transition-all"
+                className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  isDark 
+                    ? 'bg-[#1F1F23] text-gray-300 hover:bg-[#27272A] active:bg-[#3F3F46]' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300'
+                }`}
               >
                 Cancel
               </button>

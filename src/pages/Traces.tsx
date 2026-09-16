@@ -11,6 +11,7 @@ import {
   Download,
 } from 'lucide-react';
 import { EmptyState } from '../components/EmptyState';
+import { useTheme } from '../contexts/ThemeContext';
 
 const colorMap: Record<string, { bg: string; icon: string }> = {
   green: { bg: 'bg-green-50', icon: 'text-green-500' },
@@ -112,6 +113,7 @@ const traces = [
 ];
 
 export default function Traces() {
+  const { isDark } = useTheme();
   const [expandedTrace, setExpandedTrace] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
 
@@ -123,15 +125,19 @@ export default function Traces() {
     <div className="space-y-6 w-full">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#111]">Traces</h1>
-          <p className="text-sm text-[#6B7280] mt-1">Execution traces across your agent system</p>
+          <h1 className={`text-2xl font-bold ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>Traces</h1>
+          <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>Execution traces across your agent system</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-600 rounded-full text-sm font-medium hover:bg-gray-100 transition-all">
+          <button className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+            isDark ? 'bg-[#1F1F23] text-gray-300 hover:bg-[#27272A]' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+          }`}>
             <Filter size={14} />
             Filter
           </button>
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-600 rounded-full text-sm font-medium hover:bg-gray-100 transition-all">
+          <button className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+            isDark ? 'bg-[#1F1F23] text-gray-300 hover:bg-[#27272A]' : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+          }`}>
             <Download size={14} />
             Export
           </button>
@@ -147,7 +153,9 @@ export default function Traces() {
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
               filterStatus === status
                 ? 'bg-[#2F5CFF] text-white'
-                : 'bg-white text-gray-500 border border-gray-200 hover:border-gray-300'
+                : isDark
+                  ? 'bg-[#111113] text-gray-400 border border-[#1F1F23] hover:border-[#27272A]'
+                  : 'bg-white text-gray-500 border border-gray-200 hover:border-gray-300'
             }`}
           >
             {status === 'all' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1)}
@@ -168,10 +176,14 @@ export default function Traces() {
           description="Traces will appear here as your agents execute workflows. Adjust filters to see more results."
         />
       ) : (
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden w-full">
+      <div className={`rounded-3xl shadow-sm border overflow-hidden w-full ${
+        isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+      }`}>
         <div className="overflow-x-auto scrollbar-hide">
           {/* Table header */}
-          <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-gray-50 border-b border-gray-100 text-xs font-medium text-[#6B7280] min-w-[700px]">
+          <div className={`grid grid-cols-12 gap-4 px-6 py-3 border-b text-xs font-medium min-w-[700px] ${
+            isDark ? 'bg-[#1F1F23] border-[#1F1F23] text-gray-400' : 'bg-gray-50 border-gray-100 text-[#6B7280]'
+          }`}>
             <div className="col-span-1"></div>
             <div className="col-span-3">Trace ID</div>
             <div className="col-span-2">Entry Agent</div>
@@ -188,27 +200,29 @@ export default function Traces() {
             const maxDuration = Math.max(...trace.spans.map(s => s.start + s.duration));
 
             return (
-              <div key={trace.id} className="border-b border-gray-50 last:border-0">
+              <div key={trace.id} className={`border-b last:border-0 ${isDark ? 'border-[#1F1F23]' : 'border-gray-50'}`}>
                 <div
                   onClick={() => setExpandedTrace(isExpanded ? null : trace.id)}
-                  className="grid grid-cols-12 gap-4 px-6 py-4 items-center cursor-pointer hover:bg-gray-50 transition-all min-w-[700px]"
+                  className={`grid grid-cols-12 gap-4 px-6 py-4 items-center cursor-pointer transition-all min-w-[700px] ${
+                    isDark ? 'hover:bg-[#1F1F23]' : 'hover:bg-gray-50'
+                  }`}
                 >
                   <div className="col-span-1">
-                    {isExpanded ? <ChevronDown size={16} className="text-gray-400" /> : <ChevronRight size={16} className="text-gray-400" />}
+                    {isExpanded ? <ChevronDown size={16} className={isDark ? 'text-gray-400' : 'text-gray-400'} /> : <ChevronRight size={16} className={isDark ? 'text-gray-400' : 'text-gray-400'} />}
                   </div>
                   <div className="col-span-3 min-w-0">
-                    <span className="text-sm font-mono text-[#111] truncate block">{trace.id}</span>
+                    <span className={`text-sm font-mono truncate block ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>{trace.id}</span>
                   </div>
                   <div className="col-span-2 min-w-0">
                     <div className="flex items-center gap-2">
                       <div className={`w-6 h-6 rounded-full ${colors.bg} flex items-center justify-center flex-shrink-0`}>
                         <EntryIcon size={12} className={colors.icon} />
                       </div>
-                      <span className="text-sm text-[#111] truncate">{trace.entryAgent}</span>
+                      <span className={`text-sm truncate ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>{trace.entryAgent}</span>
                     </div>
                   </div>
                   <div className="col-span-2">
-                    <span className="text-sm font-medium text-[#111] whitespace-nowrap">{trace.duration}</span>
+                    <span className={`text-sm font-medium whitespace-nowrap ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>{trace.duration}</span>
                   </div>
                   <div className="col-span-2">
                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
@@ -225,17 +239,17 @@ export default function Traces() {
                   </span>
                 </div>
                 <div className="col-span-2">
-                  <span className="text-sm text-[#6B7280]">{trace.timestamp}</span>
+                  <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>{trace.timestamp}</span>
                 </div>
               </div>
 
               {/* Expanded waterfall view */}
               {isExpanded && (
                 <div className="px-6 pb-4">
-                  <div className="bg-gray-50 rounded-2xl p-4">
+                  <div className={`rounded-2xl p-4 ${isDark ? 'bg-[#1F1F23]' : 'bg-gray-50'}`}>
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs font-medium text-[#6B7280]">Span Waterfall</span>
-                      <span className="text-[10px] text-[#9CA3AF]">Total: {trace.duration}</span>
+                      <span className={`text-xs font-medium ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>Span Waterfall</span>
+                      <span className={`text-[10px] ${isDark ? 'text-gray-500' : 'text-[#9CA3AF]'}`}>Total: {trace.duration}</span>
                     </div>
                     <div className="space-y-2">
                       {trace.spans.map((span, i) => {
@@ -249,9 +263,9 @@ export default function Traces() {
                               <div className={`w-5 h-5 rounded-full ${spanColors.bg} flex items-center justify-center`}>
                                 <SpanIcon size={10} className={spanColors.icon} />
                               </div>
-                              <span className="text-[11px] text-[#6B7280] truncate">{span.name}</span>
+                              <span className={`text-[11px] truncate ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>{span.name}</span>
                             </div>
-                            <div className="flex-1 h-6 bg-white rounded-md relative overflow-hidden">
+                            <div className={`flex-1 h-6 rounded-md relative overflow-hidden ${isDark ? 'bg-[#111113]' : 'bg-white'}`}>
                               <div
                                 className={`absolute top-0.5 bottom-0.5 rounded-md flex items-center px-2 ${
                                   span.status === 'success' ? 'bg-green-100 border border-green-200' :
@@ -260,7 +274,7 @@ export default function Traces() {
                                 }`}
                                 style={{ left: `${leftPercent}%`, width: `${Math.max(widthPercent, 3)}%` }}
                               >
-                                <span className="text-[9px] font-medium text-gray-600 truncate">
+                                <span className={`text-[9px] font-medium truncate ${isDark ? 'text-gray-600' : 'text-gray-600'}`}>
                                   {span.duration}ms
                                 </span>
                               </div>

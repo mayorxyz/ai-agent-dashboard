@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Activity, CheckCircle2, AlertTriangle, XCircle, Mail } from 'lucide-react';
 import { agents, uptimeHistory, slaData } from '../data/mockData';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function Status() {
+  const { isDark } = useTheme();
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
