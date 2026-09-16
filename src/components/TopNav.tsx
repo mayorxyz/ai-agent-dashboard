@@ -63,20 +63,21 @@ export default function TopNav({ activePage, setActivePage }: TopNavProps) {
     <>
       <header className="flex items-center gap-4 px-4 lg:px-8 h-16 bg-white border-b border-gray-100 flex-shrink-0 w-full min-w-0">
         {/* Logo */}
-        <div className="flex items-center gap-3 flex-shrink-0">
+        <div className="flex items-center gap-3 flex-shrink-0" style={{ minWidth: 0 }}>
           <div className="w-8 h-8 rounded-lg bg-[#2F5CFF] flex items-center justify-center flex-shrink-0">
             <Activity size={16} className="text-white" />
           </div>
-          <span className="text-lg font-bold text-[#111] hidden sm:block whitespace-nowrap">OrchestrateIQ</span>
+          <span className="text-lg font-bold text-[#111] hidden sm:block whitespace-nowrap" style={{ minWidth: 0 }}>OrchestrateIQ</span>
         </div>
 
-        {/* Tab navigation - desktop */}
-        <nav className="hidden xl:flex flex-1 min-w-0 overflow-x-auto scrollbar-hide">
+        {/* Tab navigation - desktop - Fix #5 */}
+        <nav className="hidden xl:flex flex-1 min-w-0 overflow-x-auto scrollbar-hide" style={{ display: 'flex', flexWrap: 'nowrap', overflowX: 'auto' }}>
           <div className="flex items-center bg-gray-100 rounded-full p-1 gap-0.5 mx-auto">
             {tabs.map(({ label, page }) => (
               <button
                 key={page}
                 onClick={() => setActivePage(page)}
+                style={{ flexShrink: 0, minWidth: 0 }}
                 className={`px-3 lg:px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap active:scale-95 ${
                   activePage === page
                     ? 'bg-[#2F5CFF] text-white shadow-sm'
@@ -90,7 +91,7 @@ export default function TopNav({ activePage, setActivePage }: TopNavProps) {
         </nav>
 
         {/* Right section */}
-        <div className="flex items-center gap-2 lg:gap-3 flex-shrink-0">
+        <div className="flex items-center gap-2 lg:gap-3 flex-shrink-0" style={{ minWidth: 0 }}>
           {/* Search */}
           <button className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 active:bg-gray-200 text-gray-400 hover:text-gray-600 transition-all">
             <Search size={18} />

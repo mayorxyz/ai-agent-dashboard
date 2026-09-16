@@ -370,7 +370,7 @@ export default function Overview() {
                           </div>
                         ))}
                         {/* Now marker */}
-                        <div className="absolute top-0 bottom-0 w-px bg-[#2F5CFF] opacity-60" style={{ left: '68%' }}>
+                        <div className="absolute top-0 bottom-0 w-px bg-[#2F5CFF] opacity-60 relative" style={{ left: '68%' }}>
                           <div className="absolute -top-1 -left-1 w-2 h-2 rounded-full bg-[#2F5CFF]" />
                         </div>
                       </div>

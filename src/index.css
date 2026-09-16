@@ -22,10 +22,17 @@
   --color-coral-bg: #FEE2E2;
 }
 
+/* Fix #4: Global rules */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  min-width: 0;
+}
+
+img, svg {
+  max-width: 100%;
+  height: auto;
 }
 
 html, body {
