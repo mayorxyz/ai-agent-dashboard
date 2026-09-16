@@ -154,8 +154,8 @@ export default function Overview() {
   return (
     <div className="space-y-6 w-full">
       {/* Hero Card */}
-      <div className="bg-white rounded-3xl p-6 lg:p-8 shadow-sm border border-gray-100">
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+      <div className="bg-white rounded-3xl p-6 lg:p-8 shadow-sm border border-gray-100 w-full">
+        <div className="flex flex-col gap-4">
           <div className="min-w-0">
             <h1 className="text-2xl lg:text-4xl font-bold text-[#111] tracking-tight">
               We found your system
@@ -164,7 +164,7 @@ export default function Overview() {
               Auto-detected 6 agents across 2 workflows with 412 events in the last hour.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2 lg:gap-3">
+          <div className="flex flex-wrap items-center gap-2 lg:gap-3 w-full">
             <span className="inline-flex items-center gap-2 px-3 lg:px-4 py-2 bg-green-50 text-green-700 rounded-full text-xs lg:text-sm font-medium whitespace-nowrap">
               <CheckCircle2 size={14} />
               Setup complete · 5 of 6
@@ -605,12 +605,12 @@ function StatCard({ icon: Icon, value, label, sub, color }: { icon: any; value: 
     amber: 'bg-amber-50 text-amber-500',
   };
   return (
-    <div className="p-4 rounded-2xl border border-gray-100 hover:shadow-md transition-all min-w-0">
-      <div className={`w-8 h-8 rounded-lg ${colors[color]} flex items-center justify-center mb-3`}>
-        <Icon size={16} />
+    <div className="p-4 rounded-2xl border border-gray-100 hover:shadow-md transition-all min-w-0 overflow-hidden">
+      <div className={`w-8 h-8 rounded-lg ${colors[color]} flex items-center justify-center mb-3 flex-shrink-0`}>
+        <Icon size={16} className="flex-shrink-0" />
       </div>
       <p className="text-2xl font-bold text-[#111] truncate">{value}</p>
-      <p className="text-xs text-[#6B7280] font-medium">{label}</p>
+      <p className="text-xs text-[#6B7280] font-medium truncate">{label}</p>
       <p className="text-[10px] text-[#9CA3AF] mt-1 truncate">{sub}</p>
     </div>
   );

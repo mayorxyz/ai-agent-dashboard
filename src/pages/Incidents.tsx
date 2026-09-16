@@ -241,7 +241,7 @@ export default function Incidents() {
       </div>
 
       {/* Incident list */}
-      <div className="space-y-3">
+      <div className="space-y-3 w-full">
         {incidents.map((incident) => {
           const sevColors = severityColors[incident.severity];
           const statColors = statusConfig[incident.status];
@@ -250,39 +250,40 @@ export default function Incidents() {
             <div
               key={incident.id}
               onClick={() => setSelectedIncident(incident)}
-              className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all cursor-pointer overflow-hidden flex"
+              className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all cursor-pointer overflow-hidden flex w-full"
             >
               {/* Severity bar */}
               <div className={`w-1.5 flex-shrink-0 ${sevColors.bar}`} />
               
-              <div className="flex-1 p-5 flex items-center gap-4">
+              <div className="flex-1 p-5 flex items-center gap-4 min-w-0">
                 <div className={`w-10 h-10 rounded-xl ${sevColors.bg} flex items-center justify-center flex-shrink-0`}>
                   <AgentIcon size={18} className={sevColors.text} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <h3 className="text-sm font-semibold text-[#111] truncate">{incident.title}</h3>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${sevColors.bg} ${sevColors.text} flex-shrink-0`}>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${sevColors.bg} ${sevColors.text} flex-shrink-0 whitespace-nowrap`}>
                       {incident.severity}
                     </span>
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-[#6B7280]">
-                    <span>{incident.agent}</span>
+                  <div className="flex items-center gap-2 text-xs text-[#6B7280] flex-wrap">
+                    <span className="whitespace-nowrap">{incident.agent}</span>
                     <span>·</span>
-                    <span>{incident.timestamp}</span>
+                    <span className="whitespace-nowrap">{incident.timestamp}</span>
                     <span>·</span>
-                    <span>{incident.duration}</span>
+                    <span className="whitespace-nowrap">{incident.duration}</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 flex-shrink-0">
-                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${statColors.bg} ${statColors.text}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${statColors.dot}`} />
-                    {incident.status.charAt(0).toUpperCase() + incident.status.slice(1)}
+                <div className="flex items-center gap-2 lg:gap-3 flex-shrink-0">
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${statColors.bg} ${statColors.text}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${statColors.dot} flex-shrink-0`} />
+                    <span className="hidden sm:inline">{incident.status.charAt(0).toUpperCase() + incident.status.slice(1)}</span>
+                    <span className="sm:hidden">{incident.status.charAt(0).toUpperCase()}</span>
                   </span>
-                  <div className={`w-7 h-7 rounded-full ${incident.assigneeColor} flex items-center justify-center text-white text-[10px] font-semibold`}>
+                  <div className={`w-7 h-7 rounded-full ${incident.assigneeColor} flex items-center justify-center text-white text-[10px] font-semibold flex-shrink-0`}>
                     {incident.assignee.charAt(0)}
                   </div>
-                  <ChevronRight size={16} className="text-gray-300" />
+                  <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
                 </div>
               </div>
             </div>

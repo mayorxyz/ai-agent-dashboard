@@ -61,34 +61,36 @@ export default function TopNav({ activePage, setActivePage }: TopNavProps) {
 
   return (
     <>
-      <header className="flex items-center justify-between px-4 lg:px-8 h-16 bg-white border-b border-gray-100 flex-shrink-0 w-full min-w-0">
+      <header className="flex items-center gap-4 px-4 lg:px-8 h-16 bg-white border-b border-gray-100 flex-shrink-0 w-full min-w-0">
         {/* Logo */}
-        <div className="flex items-center gap-3 flex-shrink-0 min-w-0">
+        <div className="flex items-center gap-3 flex-shrink-0">
           <div className="w-8 h-8 rounded-lg bg-[#2F5CFF] flex items-center justify-center flex-shrink-0">
             <Activity size={16} className="text-white" />
           </div>
-          <span className="text-lg font-bold text-[#111] hidden sm:block whitespace-nowrap overflow-hidden text-ellipsis">OrchestrateIQ</span>
+          <span className="text-lg font-bold text-[#111] hidden sm:block whitespace-nowrap">OrchestrateIQ</span>
         </div>
 
         {/* Tab navigation - desktop */}
-        <nav className="hidden xl:flex items-center bg-gray-100 rounded-full p-1 gap-0.5 flex-shrink min-w-0 overflow-hidden">
-          {tabs.map(({ label, page }) => (
-            <button
-              key={page}
-              onClick={() => setActivePage(page)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap active:scale-95 flex-shrink-0 ${
-                activePage === page
-                  ? 'bg-[#2F5CFF] text-white shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/60'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
+        <nav className="hidden xl:flex flex-1 min-w-0 overflow-x-auto scrollbar-hide">
+          <div className="flex items-center bg-gray-100 rounded-full p-1 gap-0.5 mx-auto">
+            {tabs.map(({ label, page }) => (
+              <button
+                key={page}
+                onClick={() => setActivePage(page)}
+                className={`px-3 lg:px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap active:scale-95 ${
+                  activePage === page
+                    ? 'bg-[#2F5CFF] text-white shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/60'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </nav>
 
         {/* Right section */}
-        <div className="flex items-center gap-2 lg:gap-3 flex-shrink-0 min-w-0">
+        <div className="flex items-center gap-2 lg:gap-3 flex-shrink-0">
           {/* Search */}
           <button className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 active:bg-gray-200 text-gray-400 hover:text-gray-600 transition-all">
             <Search size={18} />
@@ -178,12 +180,12 @@ export default function TopNav({ activePage, setActivePage }: TopNavProps) {
       </header>
 
       {/* Mobile tab bar */}
-      <nav className="xl:hidden flex items-center overflow-x-auto bg-white border-b border-gray-100 px-4 gap-1 py-2 flex-shrink-0">
+      <nav className="xl:hidden flex items-center overflow-x-auto bg-white border-b border-gray-100 px-4 gap-1 py-2 flex-shrink-0 w-full scrollbar-hide">
         {tabs.map(({ label, page, icon: Icon }) => (
           <button
             key={page}
             onClick={() => setActivePage(page)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all active:scale-95 ${
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all active:scale-95 flex-shrink-0 ${
               activePage === page
                 ? 'bg-[#2F5CFF] text-white shadow-sm'
                 : 'text-gray-600 bg-gray-50 hover:bg-gray-100'

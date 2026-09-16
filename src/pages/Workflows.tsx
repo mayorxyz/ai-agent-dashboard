@@ -166,28 +166,28 @@ export default function Workflows() {
         {workflows.map((wf) => (
           <div
             key={wf.id}
-            className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all cursor-pointer group min-w-0"
+            className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all cursor-pointer group min-w-0 overflow-hidden"
             onClick={() => navigate(`/workflows/${wf.id}`)}
           >
-            <div className="flex items-start justify-between mb-4 gap-2">
-              <div className="min-w-0">
+            <div className="flex items-start justify-between mb-4 gap-3">
+              <div className="flex-1 min-w-0">
                 <h3 className="text-base font-semibold text-[#111] group-hover:text-[#2F5CFF] transition-colors truncate">
                   {wf.name}
                 </h3>
-                <div className="flex items-center gap-3 mt-1">
-                  <span className="inline-flex items-center gap-1 text-xs text-[#6B7280]">
-                    <Clock size={12} />
+                <div className="flex items-center gap-3 mt-1 flex-wrap">
+                  <span className="inline-flex items-center gap-1 text-xs text-[#6B7280] whitespace-nowrap">
+                    <Clock size={12} className="flex-shrink-0" />
                     {wf.lastRun}
                   </span>
-                  <span className={`inline-flex items-center gap-1 text-xs ${wf.status === 'active' ? 'text-green-600' : 'text-amber-600'}`}>
-                    {wf.status === 'active' ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />}
+                  <span className={`inline-flex items-center gap-1 text-xs whitespace-nowrap ${wf.status === 'active' ? 'text-green-600' : 'text-amber-600'}`}>
+                    {wf.status === 'active' ? <CheckCircle2 size={12} className="flex-shrink-0" /> : <AlertCircle size={12} className="flex-shrink-0" />}
                     {wf.status === 'active' ? 'Active' : 'Warning'}
                   </span>
                 </div>
               </div>
               <div className="text-right flex-shrink-0">
-                <p className="text-lg font-bold text-[#111]">{wf.successRate}%</p>
-                <p className="text-[10px] text-[#6B7280]">success rate</p>
+                <p className="text-lg font-bold text-[#111] whitespace-nowrap">{wf.successRate}%</p>
+                <p className="text-[10px] text-[#6B7280] whitespace-nowrap">success rate</p>
               </div>
             </div>
 

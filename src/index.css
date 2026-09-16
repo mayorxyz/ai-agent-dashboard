@@ -113,3 +113,19 @@ body {
 .animate-fadeIn {
   animation: fadeIn 0.15s ease-out;
 }
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Prevent text overflow in all flex children with text */
+.text-container {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

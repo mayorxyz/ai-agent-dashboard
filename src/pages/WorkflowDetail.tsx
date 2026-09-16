@@ -196,33 +196,33 @@ export default function WorkflowDetail() {
 
       {/* Stats row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0 overflow-hidden">
           <div className="flex items-center gap-2 mb-2">
-            <Activity size={16} className="text-blue-500" />
-            <span className="text-xs text-[#6B7280]">Total Runs</span>
+            <Activity size={16} className="text-blue-500 flex-shrink-0" />
+            <span className="text-xs text-[#6B7280] truncate">Total Runs</span>
           </div>
-          <p className="text-2xl font-bold text-[#111]">{workflow.runs.toLocaleString()}</p>
+          <p className="text-2xl font-bold text-[#111] truncate">{workflow.runs.toLocaleString()}</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0 overflow-hidden">
           <div className="flex items-center gap-2 mb-2">
-            <CheckCircle2 size={16} className="text-green-500" />
-            <span className="text-xs text-[#6B7280]">Success Rate</span>
+            <CheckCircle2 size={16} className="text-green-500 flex-shrink-0" />
+            <span className="text-xs text-[#6B7280] truncate">Success Rate</span>
           </div>
-          <p className="text-2xl font-bold text-green-600">{workflow.successRate}%</p>
+          <p className="text-2xl font-bold text-green-600 truncate">{workflow.successRate}%</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0 overflow-hidden">
           <div className="flex items-center gap-2 mb-2">
-            <Clock size={16} className="text-purple-500" />
-            <span className="text-xs text-[#6B7280]">Avg Duration</span>
+            <Clock size={16} className="text-purple-500 flex-shrink-0" />
+            <span className="text-xs text-[#6B7280] truncate">Avg Duration</span>
           </div>
-          <p className="text-2xl font-bold text-[#111]">{workflow.avgDuration}</p>
+          <p className="text-2xl font-bold text-[#111] truncate">{workflow.avgDuration}</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0 overflow-hidden">
           <div className="flex items-center gap-2 mb-2">
-            <Zap size={16} className="text-amber-500" />
-            <span className="text-xs text-[#6B7280]">Last Run</span>
+            <Zap size={16} className="text-amber-500 flex-shrink-0" />
+            <span className="text-xs text-[#6B7280] truncate">Last Run</span>
           </div>
-          <p className="text-2xl font-bold text-[#111]">{workflow.lastRun}</p>
+          <p className="text-2xl font-bold text-[#111] truncate">{workflow.lastRun}</p>
         </div>
       </div>
 

@@ -105,57 +105,57 @@ export default function Insights() {
 
       {/* Top stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0 overflow-hidden">
           <div className="flex items-center justify-between mb-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
               <Clock size={18} className="text-blue-500" />
             </div>
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full">
-              <ArrowUpRight size={12} />
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap">
+              <ArrowUpRight size={12} className="flex-shrink-0" />
               +12%
             </span>
           </div>
-          <p className="text-2xl font-bold text-[#111]">1.52s</p>
-          <p className="text-xs text-[#6B7280]">Avg latency</p>
+          <p className="text-2xl font-bold text-[#111] truncate">1.52s</p>
+          <p className="text-xs text-[#6B7280] truncate">Avg latency</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0 overflow-hidden">
           <div className="flex items-center justify-between mb-3">
-            <div className="w-9 h-9 rounded-xl bg-green-50 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0">
               <DollarSign size={18} className="text-green-500" />
             </div>
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-              <ArrowDownRight size={12} />
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap">
+              <ArrowDownRight size={12} className="flex-shrink-0" />
               -8%
             </span>
           </div>
-          <p className="text-2xl font-bold text-[#111]">$54.40</p>
-          <p className="text-xs text-[#6B7280]">Cost today</p>
+          <p className="text-2xl font-bold text-[#111] truncate">$54.40</p>
+          <p className="text-xs text-[#6B7280] truncate">Cost today</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0 overflow-hidden">
           <div className="flex items-center justify-between mb-3">
-            <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
               <AlertTriangle size={18} className="text-red-500" />
             </div>
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full">
-              <ArrowUpRight size={12} />
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap">
+              <ArrowUpRight size={12} className="flex-shrink-0" />
               +0.3%
             </span>
           </div>
-          <p className="text-2xl font-bold text-[#111]">0.9%</p>
-          <p className="text-xs text-[#6B7280]">Error rate</p>
+          <p className="text-2xl font-bold text-[#111] truncate">0.9%</p>
+          <p className="text-xs text-[#6B7280] truncate">Error rate</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 min-w-0 overflow-hidden">
           <div className="flex items-center justify-between mb-3">
-            <div className="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0">
               <Zap size={18} className="text-purple-500" />
             </div>
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-              <ArrowUpRight size={12} />
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap">
+              <ArrowUpRight size={12} className="flex-shrink-0" />
               +5%
             </span>
           </div>
-          <p className="text-2xl font-bold text-[#111]">412</p>
-          <p className="text-xs text-[#6B7280]">Events / hour</p>
+          <p className="text-2xl font-bold text-[#111] truncate">412</p>
+          <p className="text-xs text-[#6B7280] truncate">Events / hour</p>
         </div>
       </div>
 

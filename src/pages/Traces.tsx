@@ -160,53 +160,54 @@ export default function Traces() {
       </div>
 
       {/* Traces list */}
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-        {/* Table header */}
-        <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-gray-50 border-b border-gray-100 text-xs font-medium text-[#6B7280]">
-          <div className="col-span-1"></div>
-          <div className="col-span-3">Trace ID</div>
-          <div className="col-span-2">Entry Agent</div>
-          <div className="col-span-2">Duration</div>
-          <div className="col-span-2">Status</div>
-          <div className="col-span-2">Timestamp</div>
-        </div>
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden w-full">
+        <div className="overflow-x-auto scrollbar-hide">
+          {/* Table header */}
+          <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-gray-50 border-b border-gray-100 text-xs font-medium text-[#6B7280] min-w-[700px]">
+            <div className="col-span-1"></div>
+            <div className="col-span-3">Trace ID</div>
+            <div className="col-span-2">Entry Agent</div>
+            <div className="col-span-2">Duration</div>
+            <div className="col-span-2">Status</div>
+            <div className="col-span-2">Timestamp</div>
+          </div>
 
-        {/* Trace rows */}
-        {filteredTraces.map((trace) => {
-          const isExpanded = expandedTrace === trace.id;
-          const EntryIcon = trace.entryIcon;
-          const colors = colorMap[trace.entryColor];
-          const maxDuration = Math.max(...trace.spans.map(s => s.start + s.duration));
+          {/* Trace rows */}
+          {filteredTraces.map((trace) => {
+            const isExpanded = expandedTrace === trace.id;
+            const EntryIcon = trace.entryIcon;
+            const colors = colorMap[trace.entryColor];
+            const maxDuration = Math.max(...trace.spans.map(s => s.start + s.duration));
 
-          return (
-            <div key={trace.id} className="border-b border-gray-50 last:border-0">
-              <div
-                onClick={() => setExpandedTrace(isExpanded ? null : trace.id)}
-                className="grid grid-cols-12 gap-4 px-6 py-4 items-center cursor-pointer hover:bg-gray-50 transition-all"
-              >
-                <div className="col-span-1">
-                  {isExpanded ? <ChevronDown size={16} className="text-gray-400" /> : <ChevronRight size={16} className="text-gray-400" />}
-                </div>
-                <div className="col-span-3">
-                  <span className="text-sm font-mono text-[#111]">{trace.id}</span>
-                </div>
-                <div className="col-span-2">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-6 h-6 rounded-full ${colors.bg} flex items-center justify-center`}>
-                      <EntryIcon size={12} className={colors.icon} />
-                    </div>
-                    <span className="text-sm text-[#111]">{trace.entryAgent}</span>
+            return (
+              <div key={trace.id} className="border-b border-gray-50 last:border-0">
+                <div
+                  onClick={() => setExpandedTrace(isExpanded ? null : trace.id)}
+                  className="grid grid-cols-12 gap-4 px-6 py-4 items-center cursor-pointer hover:bg-gray-50 transition-all min-w-[700px]"
+                >
+                  <div className="col-span-1">
+                    {isExpanded ? <ChevronDown size={16} className="text-gray-400" /> : <ChevronRight size={16} className="text-gray-400" />}
                   </div>
-                </div>
-                <div className="col-span-2">
-                  <span className="text-sm font-medium text-[#111]">{trace.duration}</span>
-                </div>
-                <div className="col-span-2">
-                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                    trace.status === 'success' ? 'bg-green-50 text-green-700' :
-                    trace.status === 'error' ? 'bg-red-50 text-red-700' :
-                    'bg-amber-50 text-amber-700'
-                  }`}>
+                  <div className="col-span-3 min-w-0">
+                    <span className="text-sm font-mono text-[#111] truncate block">{trace.id}</span>
+                  </div>
+                  <div className="col-span-2 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-6 h-6 rounded-full ${colors.bg} flex items-center justify-center flex-shrink-0`}>
+                        <EntryIcon size={12} className={colors.icon} />
+                      </div>
+                      <span className="text-sm text-[#111] truncate">{trace.entryAgent}</span>
+                    </div>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-sm font-medium text-[#111] whitespace-nowrap">{trace.duration}</span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                      trace.status === 'success' ? 'bg-green-50 text-green-700' :
+                      trace.status === 'error' ? 'bg-red-50 text-red-700' :
+                      'bg-amber-50 text-amber-700'
+                    }`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${
                       trace.status === 'success' ? 'bg-green-500' :
                       trace.status === 'error' ? 'bg-red-500' :
@@ -266,6 +267,7 @@ export default function Traces() {
             </div>
           );
         })}
+        </div>
       </div>
     </div>
   );
