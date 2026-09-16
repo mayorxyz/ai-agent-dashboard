@@ -24,6 +24,7 @@ import {
   X,
   Check,
 } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 import type { Page } from '../App';
 
 interface OverviewProps {
@@ -71,6 +72,7 @@ const timeRanges = ['Last 1h', 'Last 24h', 'Last 7d', 'Last 30d', 'Custom'];
 
 export default function Overview() {
   const navigate = useNavigate();
+  const { isDark } = useTheme();
   const [showFilter, setShowFilter] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedTimeRange, setSelectedTimeRange] = useState('Last 1h');
@@ -154,13 +156,15 @@ export default function Overview() {
   return (
     <div className="space-y-6 w-full">
       {/* Hero Card */}
-      <div className="bg-white rounded-3xl p-6 lg:p-8 shadow-sm border border-gray-100 w-full">
+      <div className={`rounded-3xl p-6 lg:p-8 shadow-sm border w-full transition-colors duration-300 ${
+        isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+      }`}>
         <div className="flex flex-col gap-4">
           <div className="min-w-0">
-            <h1 className="text-2xl lg:text-4xl font-bold text-[#111] tracking-tight">
+            <h1 className={`text-2xl lg:text-4xl font-bold tracking-tight ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>
               We found your system
             </h1>
-            <p className="mt-2 text-[#6B7280] text-base lg:text-lg">
+            <p className={`mt-2 text-base lg:text-lg ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>
               Auto-detected 6 agents across 2 workflows with 412 events in the last hour.
             </p>
           </div>
@@ -292,10 +296,12 @@ export default function Overview() {
       {/* Agents + Timeline */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 w-full">
         {/* Agents List */}
-        <div className="xl:col-span-3 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-w-0">
+        <div className={`xl:col-span-3 rounded-3xl p-6 shadow-sm border min-w-0 transition-colors duration-300 ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-[#111]">Agents</h2>
-            <span className="text-xs text-[#6B7280] bg-gray-50 px-2 py-1 rounded-full">{filteredAgents.length}</span>
+            <h2 className={`text-lg font-semibold ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>Agents</h2>
+            <span className={`text-xs px-2 py-1 rounded-full ${isDark ? 'text-gray-400 bg-[#1F1F23]' : 'text-[#6B7280] bg-gray-50'}`}>{filteredAgents.length}</span>
           </div>
           <div className="space-y-2">
             {filteredAgents.map((agent) => {
@@ -304,32 +310,36 @@ export default function Overview() {
               return (
                 <div
                   key={agent.name}
-                  className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 active:bg-gray-100 transition-all cursor-pointer group"
+                  className={`flex items-center gap-3 p-3 rounded-2xl transition-all cursor-pointer group ${
+                    isDark ? 'hover:bg-[#1F1F23] active:bg-[#27272A]' : 'hover:bg-gray-50 active:bg-gray-100'
+                  }`}
                 >
                   <div className={`w-10 h-10 rounded-full ${colors.bg} flex items-center justify-center flex-shrink-0`}>
                     <Icon size={18} className={colors.icon} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#111] truncate">{agent.name}</p>
-                    <p className="text-xs text-[#6B7280] truncate">{agent.role}</p>
+                    <p className={`text-sm font-semibold truncate ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>{agent.name}</p>
+                    <p className={`text-xs truncate ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>{agent.role}</p>
                   </div>
-                  <span className="text-xs font-medium text-[#6B7280] bg-gray-50 px-2 py-1 rounded-full flex-shrink-0">
+                  <span className={`text-xs font-medium px-2 py-1 rounded-full flex-shrink-0 ${isDark ? 'text-gray-400 bg-[#1F1F23]' : 'text-[#6B7280] bg-gray-50'}`}>
                     {agent.calls}
                   </span>
                 </div>
               );
             })}
             {filteredAgents.length === 0 && (
-              <p className="text-sm text-[#6B7280] text-center py-4">No agents match filters</p>
+              <p className={`text-sm text-center py-4 ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>No agents match filters</p>
             )}
           </div>
         </div>
 
         {/* Timeline */}
-        <div className="xl:col-span-9 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-w-0">
+        <div className={`xl:col-span-9 rounded-3xl p-6 shadow-sm border min-w-0 transition-colors duration-300 ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-[#111]">Agent Activity Timeline</h2>
-            <span className="text-xs text-[#6B7280]">15-min increments</span>
+            <h2 className={`text-lg font-semibold ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>Agent Activity Timeline</h2>
+            <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>15-min increments</span>
           </div>
           
           {/* Time ticks - contained scrollable area */}
@@ -355,16 +365,22 @@ export default function Overview() {
                         </div>
                         <span className="text-xs font-medium text-[#111] truncate">{row.agent}</span>
                       </div>
-                      <div className="flex-1 h-8 bg-gray-50 rounded-lg relative overflow-hidden min-w-0">
+                      <div className={`flex-1 h-8 rounded-lg relative overflow-hidden min-w-0 ${isDark ? 'bg-[#1F1F23]' : 'bg-gray-50'}`}>
                         {row.segments.map((seg, i) => (
                           <div
                             key={i}
                             className={`absolute top-1 bottom-1 rounded-md flex items-center px-2 ${
-                              seg.state === 'healthy' ? 'bg-green-100 border border-green-200' : 'bg-blue-100 border border-blue-200'
+                              seg.state === 'healthy' 
+                                ? isDark ? 'bg-green-900/30 border border-green-700/50' : 'bg-green-100 border border-green-200'
+                                : isDark ? 'bg-blue-900/30 border border-blue-700/50' : 'bg-blue-100 border border-blue-200'
                             }`}
                             style={{ left: `${seg.start}%`, width: `${seg.width}%` }}
                           >
-                            <span className={`text-[9px] font-medium truncate ${seg.state === 'healthy' ? 'text-green-700' : 'text-blue-700'}`}>
+                            <span className={`text-[9px] font-medium truncate ${
+                              seg.state === 'healthy' 
+                                ? isDark ? 'text-green-300' : 'text-green-700'
+                                : isDark ? 'text-blue-300' : 'text-blue-700'
+                            }`}>
                               {seg.status}
                             </span>
                           </div>
@@ -389,8 +405,10 @@ export default function Overview() {
       {/* Footer Section */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
         {/* Next Steps - Fix #11 */}
-        <div className="lg:col-span-4 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-w-0">
-          <h2 className="text-lg font-semibold text-[#111] mb-4">Next steps</h2>
+        <div className={`lg:col-span-4 rounded-3xl p-6 shadow-sm border min-w-0 transition-colors duration-300 ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
+          <h2 className={`text-lg font-semibold mb-4 ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>Next steps</h2>
           <div className="space-y-3">
             {nextSteps.map((step) => (
               <div
@@ -398,12 +416,18 @@ export default function Overview() {
                 onClick={() => handleCompleteStep(step.id)}
                 className={`p-4 rounded-2xl border transition-all cursor-pointer group ${
                   step.completed
-                    ? 'border-green-200 bg-green-50/50'
-                    : 'border-gray-100 hover:shadow-md hover:border-gray-200 active:scale-[0.99]'
+                    ? isDark ? 'border-green-700/50 bg-green-900/20' : 'border-green-200 bg-green-50/50'
+                    : isDark
+                      ? 'border-[#1F1F23] hover:shadow-md hover:border-[#27272A] active:scale-[0.99]'
+                      : 'border-gray-100 hover:shadow-md hover:border-gray-200 active:scale-[0.99]'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2 mb-2">
-                  <h3 className={`text-sm font-semibold ${step.completed ? 'text-[#6B7280] line-through' : 'text-[#111]'}`}>
+                  <h3 className={`text-sm font-semibold ${step.completed ? 'line-through' : ''} ${
+                    step.completed 
+                      ? isDark ? 'text-gray-500' : 'text-[#6B7280]'
+                      : isDark ? 'text-gray-100' : 'text-[#111]'
+                  }`}>
                     {step.title}
                   </h3>
                   {step.completed ? (
@@ -442,25 +466,29 @@ export default function Overview() {
         </div>
 
         {/* Detected Stats */}
-        <div className="lg:col-span-4 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-w-0">
-          <h2 className="text-lg font-semibold text-[#111] mb-4">Detected</h2>
+        <div className={`lg:col-span-4 rounded-3xl p-6 shadow-sm border min-w-0 transition-colors duration-300 ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
+          <h2 className={`text-lg font-semibold mb-4 ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>Detected</h2>
           <div className="grid grid-cols-2 gap-3">
-            <StatCard icon={Users} value="6" label="agents" sub="92% confidence" color="purple" />
-            <StatCard icon={GitBranch} value="2" label="workflows" sub="Auto-detected" color="blue" />
-            <StatCard icon={ArrowRightLeft} value="9" label="handoffs" sub="Last hour" color="green" />
-            <StatCard icon={Zap} value="412" label="events" sub="Processing" color="amber" />
+            <StatCard icon={Users} value="6" label="agents" sub="92% confidence" color="purple" isDark={isDark} />
+            <StatCard icon={GitBranch} value="2" label="workflows" sub="Auto-detected" color="blue" isDark={isDark} />
+            <StatCard icon={ArrowRightLeft} value="9" label="handoffs" sub="Last hour" color="green" isDark={isDark} />
+            <StatCard icon={Zap} value="412" label="events" sub="Processing" color="amber" isDark={isDark} />
           </div>
         </div>
 
         {/* AI Assistant - Fix #10 */}
-        <div className="lg:col-span-4 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col min-w-0">
+        <div className={`lg:col-span-4 rounded-3xl p-6 shadow-sm border flex flex-col min-w-0 transition-colors duration-300 ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-blue-500 flex items-center justify-center flex-shrink-0">
               <Sparkles size={14} className="text-white" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-[#111]">AI Assistant</p>
-              <p className="text-[10px] text-[#6B7280]">Welcome, Alex — what can I help with?</p>
+              <p className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>AI Assistant</p>
+              <p className={`text-[10px] ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>Welcome, Alex — what can I help with?</p>
             </div>
           </div>
 
@@ -487,7 +515,11 @@ export default function Overview() {
               <button
                 key={action}
                 onClick={() => handleQuickAction(action)}
-                className="px-2.5 py-1.5 bg-gray-50 text-gray-600 text-[11px] font-medium rounded-full hover:bg-gray-100 active:bg-gray-200 transition-all"
+                className={`px-2.5 py-1.5 text-[11px] font-medium rounded-full transition-all ${
+                  isDark 
+                    ? 'bg-[#1F1F23] text-gray-300 hover:bg-[#27272A] active:bg-[#3F3F46]' 
+                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100 active:bg-gray-200'
+                }`}
               >
                 {action}
               </button>
@@ -511,7 +543,9 @@ export default function Overview() {
           )}
 
           {/* Chat input */}
-          <div className="border border-gray-200 rounded-2xl p-3 focus-within:border-[#2F5CFF] focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+          <div className={`border rounded-2xl p-3 focus-within:border-[#2F5CFF] focus-within:ring-2 focus-within:ring-blue-100 transition-all ${
+            isDark ? 'border-[#27272A]' : 'border-gray-200'
+          }`}>
             <div className="flex items-center gap-2">
               <input
                 type="text"
@@ -519,19 +553,27 @@ export default function Overview() {
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleSendMessage(); }}
                 placeholder="Ask about your agents..."
-                className="flex-1 text-sm text-[#111] placeholder:text-gray-400 outline-none bg-transparent min-w-0"
+                className={`flex-1 text-sm outline-none bg-transparent min-w-0 ${
+                  isDark ? 'text-gray-100 placeholder:text-gray-500' : 'text-[#111] placeholder:text-gray-400'
+                }`}
               />
-              <span className="text-[10px] text-gray-300 flex-shrink-0">{chatInput.length}/500</span>
+              <span className={`text-[10px] flex-shrink-0 ${isDark ? 'text-gray-500' : 'text-gray-300'}`}>{chatInput.length}/500</span>
             </div>
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
+            <div className={`flex items-center justify-between mt-2 pt-2 border-t ${isDark ? 'border-[#27272A]' : 'border-gray-100'}`}>
               <div className="flex items-center gap-1">
-                <button className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-50 active:bg-gray-100 text-gray-400 transition-all">
+                <button className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${
+                  isDark ? 'hover:bg-[#1F1F23] active:bg-[#27272A] text-gray-400' : 'hover:bg-gray-50 active:bg-gray-100 text-gray-400'
+                }`}>
                   <Paperclip size={14} />
                 </button>
-                <button className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-50 active:bg-gray-100 text-gray-400 transition-all">
+                <button className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${
+                  isDark ? 'hover:bg-[#1F1F23] active:bg-[#27272A] text-gray-400' : 'hover:bg-gray-50 active:bg-gray-100 text-gray-400'
+                }`}>
                   <Sparkles size={14} />
                 </button>
-                <button className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-50 active:bg-gray-100 text-gray-400 transition-all">
+                <button className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${
+                  isDark ? 'hover:bg-[#1F1F23] active:bg-[#27272A] text-gray-400' : 'hover:bg-gray-50 active:bg-gray-100 text-gray-400'
+                }`}>
                   <Mic size={14} />
                 </button>
               </div>
@@ -597,21 +639,29 @@ export default function Overview() {
   );
 }
 
-function StatCard({ icon: Icon, value, label, sub, color }: { icon: any; value: string; label: string; sub: string; color: string }) {
+function StatCard({ icon: Icon, value, label, sub, color, isDark }: { icon: any; value: string; label: string; sub: string; color: string; isDark: boolean }) {
   const colors: Record<string, string> = {
     purple: 'bg-purple-50 text-purple-500',
     blue: 'bg-blue-50 text-blue-500',
     green: 'bg-green-50 text-green-500',
     amber: 'bg-amber-50 text-amber-500',
   };
+  const darkColors: Record<string, string> = {
+    purple: 'bg-purple-900/30 text-purple-400',
+    blue: 'bg-blue-900/30 text-blue-400',
+    green: 'bg-green-900/30 text-green-400',
+    amber: 'bg-amber-900/30 text-amber-400',
+  };
   return (
-    <div className="p-4 rounded-2xl border border-gray-100 hover:shadow-md transition-all min-w-0 overflow-hidden">
-      <div className={`w-8 h-8 rounded-lg ${colors[color]} flex items-center justify-center mb-3 flex-shrink-0`}>
+    <div className={`p-4 rounded-2xl border hover:shadow-md transition-all min-w-0 overflow-hidden ${
+      isDark ? 'border-[#1F1F23] hover:border-[#27272A]' : 'border-gray-100'
+    }`}>
+      <div className={`w-8 h-8 rounded-lg ${isDark ? darkColors[color] : colors[color]} flex items-center justify-center mb-3 flex-shrink-0`}>
         <Icon size={16} className="flex-shrink-0" />
       </div>
-      <p className="text-2xl font-bold text-[#111] truncate">{value}</p>
-      <p className="text-xs text-[#6B7280] font-medium truncate">{label}</p>
-      <p className="text-[10px] text-[#9CA3AF] mt-1 truncate">{sub}</p>
+      <p className={`text-2xl font-bold truncate ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>{value}</p>
+      <p className={`text-xs font-medium truncate ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>{label}</p>
+      <p className={`text-[10px] mt-1 truncate ${isDark ? 'text-gray-500' : 'text-[#9CA3AF]'}`}>{sub}</p>
     </div>
   );
 }

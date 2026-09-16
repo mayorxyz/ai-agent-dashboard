@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   LayoutDashboard,
   Box,
@@ -11,6 +10,7 @@ import {
   Moon,
   Activity,
 } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 import type { Page } from '../App';
 
 interface SidebarProps {
@@ -31,28 +31,34 @@ const bottomNavItems: { icon: typeof Settings; label: string; page: Page }[] = [
 ];
 
 export default function Sidebar({ activePage, setActivePage }: SidebarProps) {
-  const [darkMode, setDarkMode] = useState(false);
+  const { isDark, toggleTheme } = useTheme();
 
   return (
-    <aside className="hidden md:flex w-16 lg:w-[72px] flex-shrink-0 h-screen flex-col items-center bg-white border-r border-gray-100">
+    <aside className={`hidden md:flex w-16 lg:w-[72px] flex-shrink-0 h-screen flex-col items-center transition-colors duration-300 ${
+      isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+    } border-r`}>
       {/* Top section: Logo + Theme toggle */}
       <div className="flex flex-col items-center pt-5 pb-3 gap-2">
         <div className="w-9 h-9 rounded-xl bg-[#2F5CFF] flex items-center justify-center mb-1">
           <Activity size={16} className="text-white" />
         </div>
         <button
-          onClick={() => setDarkMode(!darkMode)}
-          className="w-10 h-10 flex items-center justify-center rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-all"
+          onClick={toggleTheme}
+          className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all ${
+            isDark 
+              ? 'text-gray-400 hover:text-yellow-300 hover:bg-[#1F1F23]' 
+              : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+          }`}
           title="Toggle theme"
         >
-          {darkMode ? <Moon size={18} /> : <Sun size={18} />}
+          {isDark ? <Moon size={18} /> : <Sun size={18} />}
         </button>
       </div>
 
       {/* Divider */}
-      <div className="w-8 h-px bg-gray-100" />
+      <div className={`w-8 h-px ${isDark ? 'bg-[#1F1F23]' : 'bg-gray-100'}`} />
 
-      {/* Middle section: Main navigation (scrollable if needed) */}
+      {/* Middle section: Main navigation */}
       <nav className="flex-1 flex flex-col items-center gap-1 py-4 overflow-y-auto w-full px-2">
         {topNavItems.map(({ icon: Icon, label, page }) => (
           <button
@@ -62,7 +68,9 @@ export default function Sidebar({ activePage, setActivePage }: SidebarProps) {
             className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all active:scale-95 ${
               activePage === page
                 ? 'bg-[#2F5CFF] text-white shadow-lg shadow-blue-500/20'
-                : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                : isDark
+                  ? 'text-gray-400 hover:text-gray-200 hover:bg-[#1F1F23]'
+                  : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
             }`}
           >
             <Icon size={20} />
@@ -72,7 +80,7 @@ export default function Sidebar({ activePage, setActivePage }: SidebarProps) {
 
       {/* Bottom section: Secondary nav + help */}
       <div className="flex flex-col items-center gap-1 pb-4 pt-2 w-full px-2">
-        <div className="w-8 h-px bg-gray-100 mb-2" />
+        <div className={`w-8 h-px ${isDark ? 'bg-[#1F1F23]' : 'bg-gray-100'} mb-2`} />
         {bottomNavItems.map(({ icon: Icon, label, page }) => (
           <button
             key={page}
@@ -81,7 +89,9 @@ export default function Sidebar({ activePage, setActivePage }: SidebarProps) {
             className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all active:scale-95 ${
               activePage === page
                 ? 'bg-[#2F5CFF] text-white shadow-lg shadow-blue-500/20'
-                : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                : isDark
+                  ? 'text-gray-400 hover:text-gray-200 hover:bg-[#1F1F23]'
+                  : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
             }`}
           >
             <Icon size={20} />
@@ -89,7 +99,11 @@ export default function Sidebar({ activePage, setActivePage }: SidebarProps) {
         ))}
         <button
           title="Help"
-          className="w-10 h-10 flex items-center justify-center rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 active:scale-95 transition-all mt-1"
+          className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all active:scale-95 ${
+            isDark
+              ? 'text-gray-400 hover:text-gray-200 hover:bg-[#1F1F23]'
+              : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+          }`}
         >
           <HelpCircle size={20} />
         </button>

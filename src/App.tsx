@@ -1,4 +1,5 @@
 import { HashRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import Sidebar from './components/Sidebar';
 import TopNav from './components/TopNav';
 import Overview from './pages/Overview';
@@ -32,6 +33,7 @@ const pageToPath: Record<Page, string> = {
 function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isDark } = useTheme();
   const activePage = pathToPage[location.pathname] || 'overview';
 
   const setActivePage = (page: Page) => {
@@ -39,7 +41,9 @@ function Layout() {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#F3F3F4]">
+    <div className={`flex h-screen w-screen overflow-hidden transition-colors duration-300 ${
+      isDark ? 'bg-[#0A0A0B]' : 'bg-[#F3F3F4]'
+    }`}>
       <Sidebar activePage={activePage} setActivePage={setActivePage} />
       <div className="flex flex-1 flex-col overflow-hidden min-w-0">
         <TopNav activePage={activePage} setActivePage={setActivePage} />
@@ -63,9 +67,11 @@ function Layout() {
 
 function App() {
   return (
-    <HashRouter>
-      <Layout />
-    </HashRouter>
+    <ThemeProvider>
+      <HashRouter>
+        <Layout />
+      </HashRouter>
+    </ThemeProvider>
   );
 }
 
