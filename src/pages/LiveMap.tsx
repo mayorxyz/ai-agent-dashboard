@@ -287,6 +287,93 @@ export default function LiveMap() {
           </div>
         </div>
       </div>
+
+      {/* Sankey Diagram - Handoff Volume */}
+      <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 w-full min-w-0">
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold text-[#111]">Handoff Volume</h2>
+          <p className="text-xs text-[#6B7280]">Agent-to-agent communication flow</p>
+        </div>
+        <div className="overflow-x-auto">
+          <svg viewBox="0 0 800 300" className="w-full min-w-[600px]" style={{ minHeight: '300px' }}>
+            {/* Nodes */}
+            <g>
+              {/* Supervisor */}
+              <rect x="50" y="100" width="80" height="100" fill="#8B5CF6" opacity="0.8" rx="4" />
+              <text x="90" y="155" textAnchor="middle" fill="white" fontSize="12" fontWeight="600">Supervisor</text>
+              
+              {/* Researcher */}
+              <rect x="250" y="50" width="80" height="80" fill="#10B981" opacity="0.8" rx="4" />
+              <text x="290" y="95" textAnchor="middle" fill="white" fontSize="12" fontWeight="600">Researcher</text>
+              
+              {/* DataFetcher */}
+              <rect x="250" y="170" width="80" height="100" fill="#3B82F6" opacity="0.8" rx="4" />
+              <text x="290" y="225" textAnchor="middle" fill="white" fontSize="12" fontWeight="600">DataFetcher</text>
+              
+              {/* Validator */}
+              <rect x="470" y="100" width="80" height="120" fill="#F59E0B" opacity="0.8" rx="4" />
+              <text x="510" y="165" textAnchor="middle" fill="white" fontSize="12" fontWeight="600">Validator</text>
+              
+              {/* Responder */}
+              <rect x="670" y="80" width="80" height="140" fill="#EF4444" opacity="0.8" rx="4" />
+              <text x="710" y="155" textAnchor="middle" fill="white" fontSize="12" fontWeight="600">Responder</text>
+            </g>
+
+            {/* Flows */}
+            <g opacity="0.6">
+              {/* Supervisor → Researcher (89) */}
+              <path d="M 130 130 C 200 130, 200 90, 250 90" fill="none" stroke="#8B5CF6" strokeWidth="12" />
+              <text x="190" y="100" textAnchor="middle" fill="#6B7280" fontSize="10">89</text>
+              
+              {/* Supervisor → DataFetcher (145) */}
+              <path d="M 130 170 C 200 170, 200 220, 250 220" fill="none" stroke="#8B5CF6" strokeWidth="18" />
+              <text x="190" y="210" textAnchor="middle" fill="#6B7280" fontSize="10">145</text>
+              
+              {/* Researcher → Validator (67) */}
+              <path d="M 330 90 C 400 90, 400 140, 470 140" fill="none" stroke="#10B981" strokeWidth="8" />
+              <text x="400" y="110" textAnchor="middle" fill="#6B7280" fontSize="10">67</text>
+              
+              {/* DataFetcher → Validator (178) */}
+              <path d="M 330 220 C 400 220, 400 180, 470 180" fill="none" stroke="#3B82F6" strokeWidth="22" />
+              <text x="400" y="210" textAnchor="middle" fill="#6B7280" fontSize="10">178</text>
+              
+              {/* Validator → Responder (178) */}
+              <path d="M 550 160 C 620 160, 620 150, 670 150" fill="none" stroke="#F59E0B" strokeWidth="22" />
+              <text x="610" y="145" textAnchor="middle" fill="#6B7280" fontSize="10">178</text>
+              
+              {/* Researcher → Responder (22) */}
+              <path d="M 330 70 C 500 70, 500 100, 670 100" fill="none" stroke="#10B981" strokeWidth="3" />
+              <text x="500" y="80" textAnchor="middle" fill="#6B7280" fontSize="10">22</text>
+              
+              {/* DataFetcher → Responder (56) */}
+              <path d="M 330 250 C 500 250, 500 200, 670 200" fill="none" stroke="#3B82F6" strokeWidth="7" />
+              <text x="500" y="240" textAnchor="middle" fill="#6B7280" fontSize="10">56</text>
+            </g>
+          </svg>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-4 text-xs text-[#6B7280]">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#8B5CF6' }} />
+            <span>Supervisor</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#10B981' }} />
+            <span>Researcher</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#3B82F6' }} />
+            <span>DataFetcher</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#F59E0B' }} />
+            <span>Validator</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#EF4444' }} />
+            <span>Responder</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -11,8 +11,13 @@ import Incidents from './pages/Incidents';
 import Insights from './pages/Insights';
 import Cost from './pages/Cost';
 import Compare from './pages/Compare';
+import ROI from './pages/ROI';
+import Sandbox from './pages/Sandbox';
+import Status from './pages/Status';
+import Onboarding from './pages/Onboarding';
+import AgentDetail from './pages/AgentDetail';
 
-export type Page = 'overview' | 'workflows' | 'livemap' | 'traces' | 'incidents' | 'insights' | 'cost' | 'compare';
+export type Page = 'overview' | 'workflows' | 'livemap' | 'traces' | 'incidents' | 'insights' | 'cost' | 'compare' | 'roi' | 'sandbox';
 
 const pathToPage: Record<string, Page> = {
   '/': 'overview',
@@ -23,6 +28,8 @@ const pathToPage: Record<string, Page> = {
   '/insights': 'insights',
   '/cost': 'cost',
   '/compare': 'compare',
+  '/roi': 'roi',
+  '/sandbox': 'sandbox',
 };
 
 const pageToPath: Record<Page, string> = {
@@ -34,6 +41,8 @@ const pageToPath: Record<Page, string> = {
   insights: '/insights',
   cost: '/cost',
   compare: '/compare',
+  roi: '/roi',
+  sandbox: '/sandbox',
 };
 
 function Layout() {
@@ -65,6 +74,11 @@ function Layout() {
               <Route path="/insights" element={<Insights />} />
               <Route path="/cost" element={<Cost />} />
               <Route path="/compare" element={<Compare />} />
+              <Route path="/roi" element={<ROI />} />
+              <Route path="/sandbox" element={<Sandbox />} />
+              <Route path="/status" element={<Status />} />
+              <Route path="/onboarding" element={<Onboarding />} />
+              <Route path="/agent/:agentName" element={<AgentDetail />} />
             </Routes>
           </div>
         </main>

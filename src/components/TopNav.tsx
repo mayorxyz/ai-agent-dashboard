@@ -18,9 +18,11 @@ import {
   CreditCard,
   Check,
   CheckCheck,
+  Plus,
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import SearchModal from './SearchModal';
+import { workspaces } from '../data/mockData';
 import type { Page } from '../App';
 
 interface TopNavProps {
@@ -52,10 +54,13 @@ export default function TopNav({ activePage, setActivePage }: TopNavProps) {
   const [showNotifs, setShowNotifs] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [showWorkspace, setShowWorkspace] = useState(false);
+  const [activeWorkspace, setActiveWorkspace] = useState(workspaces[0]);
   const [notifications, setNotifications] = useState(initialNotifications);
   const [toast, setToast] = useState<string | null>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const accountRef = useRef<HTMLDivElement>(null);
+  const workspaceRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -79,6 +84,9 @@ export default function TopNav({ activePage, setActivePage }: TopNavProps) {
       }
       if (accountRef.current && !accountRef.current.contains(e.target as Node)) {
         setShowAccount(false);
+      }
+      if (workspaceRef.current && !workspaceRef.current.contains(e.target as Node)) {
+        setShowWorkspace(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -238,6 +246,74 @@ export default function TopNav({ activePage, setActivePage }: TopNavProps) {
                     className="w-full text-center text-xs text-[#2F5CFF] font-medium hover:underline py-1"
                   >
                     View all notifications
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Workspace Switcher */}
+          <div className="relative hidden md:block" ref={workspaceRef}>
+            <button
+              onClick={() => { setShowWorkspace(!showWorkspace); setShowNotifs(false); setShowAccount(false); }}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                isDark 
+                  ? 'bg-[#1F1F23] text-gray-300 hover:bg-[#27272A]' 
+                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              <span className="text-base">{activeWorkspace.icon}</span>
+              <span className="hidden lg:inline">{activeWorkspace.name}</span>
+              <ChevronDown size={14} className={isDark ? 'text-gray-400' : 'text-gray-500'} />
+            </button>
+
+            {showWorkspace && (
+              <div className={`absolute right-0 top-12 w-64 rounded-2xl shadow-xl border z-50 animate-fadeIn overflow-hidden ${
+                isDark ? 'bg-[#18181B] border-[#27272A]' : 'bg-white border-gray-100'
+              }`}>
+                <div className={`p-3 border-b ${isDark ? 'border-[#27272A]' : 'border-gray-100'}`}>
+                  <p className={`text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                    Workspaces
+                  </p>
+                </div>
+                <div className="py-2">
+                  {workspaces.map((workspace) => (
+                    <button
+                      key={workspace.id}
+                      onClick={() => {
+                        setActiveWorkspace(workspace);
+                        setShowWorkspace(false);
+                        showToast(`Switched to ${workspace.name}`);
+                      }}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-all ${
+                        activeWorkspace.id === workspace.id
+                          ? isDark ? 'bg-[#2F5CFF]/10 text-[#2F5CFF]' : 'bg-blue-50 text-[#2F5CFF]'
+                          : isDark ? 'text-gray-300 hover:bg-[#27272A]' : 'text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <span className="text-lg">{workspace.icon}</span>
+                      <div className="flex-1 text-left">
+                        <p className="font-medium">{workspace.name}</p>
+                        <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                          {workspace.members} members
+                        </p>
+                      </div>
+                      {activeWorkspace.id === workspace.id && <Check size={16} />}
+                    </button>
+                  ))}
+                </div>
+                <div className={`border-t p-2 ${isDark ? 'border-[#27272A]' : 'border-gray-100'}`}>
+                  <button
+                    onClick={() => {
+                      setShowWorkspace(false);
+                      showToast('Add workspace feature coming soon');
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm rounded-xl transition-all ${
+                      isDark ? 'text-gray-400 hover:bg-[#27272A]' : 'text-gray-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    <Plus size={16} />
+                    <span className="font-medium">Add workspace</span>
                   </button>
                 </div>
               </div>

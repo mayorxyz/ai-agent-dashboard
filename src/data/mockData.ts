@@ -194,3 +194,257 @@ export const agentComparisonData = {
     callVolume: 95,
   },
 };
+
+// SLA uptime data for progress rings
+export const slaData = {
+  Researcher: { uptime: 99.2, status: 'operational' as const },
+  Supervisor: { uptime: 99.8, status: 'operational' as const },
+  DataFetcher: { uptime: 94.5, status: 'degraded' as const },
+  Validator: { uptime: 97.3, status: 'operational' as const },
+  Responder: { uptime: 98.9, status: 'operational' as const },
+};
+
+// 90-day uptime history for status page
+export const uptimeHistory = {
+  Researcher: Array.from({ length: 90 }, (_, i) => ({
+    date: new Date(2024, 0, i + 1).toISOString().split('T')[0],
+    status: Math.random() > 0.02 ? 'operational' : Math.random() > 0.5 ? 'degraded' : 'outage',
+  })),
+  Supervisor: Array.from({ length: 90 }, (_, i) => ({
+    date: new Date(2024, 0, i + 1).toISOString().split('T')[0],
+    status: Math.random() > 0.01 ? 'operational' : Math.random() > 0.5 ? 'degraded' : 'outage',
+  })),
+  DataFetcher: Array.from({ length: 90 }, (_, i) => ({
+    date: new Date(2024, 0, i + 1).toISOString().split('T')[0],
+    status: Math.random() > 0.05 ? 'operational' : Math.random() > 0.5 ? 'degraded' : 'outage',
+  })),
+  Validator: Array.from({ length: 90 }, (_, i) => ({
+    date: new Date(2024, 0, i + 1).toISOString().split('T')[0],
+    status: Math.random() > 0.03 ? 'operational' : Math.random() > 0.5 ? 'degraded' : 'outage',
+  })),
+  Responder: Array.from({ length: 90 }, (_, i) => ({
+    date: new Date(2024, 0, i + 1).toISOString().split('T')[0],
+    status: Math.random() > 0.02 ? 'operational' : Math.random() > 0.5 ? 'degraded' : 'outage',
+  })),
+};
+
+// Version history for agents
+export const versionHistory = {
+  Researcher: [
+    {
+      version: 'v3',
+      timestamp: '2024-01-28T10:30:00Z',
+      author: 'Sarah K.',
+      authorAvatar: 'SK',
+      summary: 'Improved search accuracy with better context handling',
+      config: 'model: gpt-4-turbo\ntemperature: 0.3\nmax_tokens: 2000\nsearch_depth: deep\ncontext_window: 8k',
+      perfDelta: { latency: -12, errorRate: -8 },
+    },
+    {
+      version: 'v2',
+      timestamp: '2024-01-20T14:15:00Z',
+      author: 'Mike R.',
+      authorAvatar: 'MR',
+      summary: 'Added multi-source search capability',
+      config: 'model: gpt-4-turbo\ntemperature: 0.4\nmax_tokens: 1500\nsearch_depth: medium\ncontext_window: 4k',
+      perfDelta: { latency: 5, errorRate: -3 },
+    },
+    {
+      version: 'v1',
+      timestamp: '2024-01-10T09:00:00Z',
+      author: 'Alex T.',
+      authorAvatar: 'AT',
+      summary: 'Initial deployment with basic search',
+      config: 'model: gpt-3.5-turbo\ntemperature: 0.5\nmax_tokens: 1000\nsearch_depth: basic\ncontext_window: 4k',
+      perfDelta: { latency: 0, errorRate: 0 },
+    },
+  ],
+  Supervisor: [
+    {
+      version: 'v2',
+      timestamp: '2024-01-25T11:00:00Z',
+      author: 'Sarah K.',
+      authorAvatar: 'SK',
+      summary: 'Enhanced routing logic with priority queues',
+      config: 'model: gpt-4-turbo\ntemperature: 0.2\nmax_tokens: 1000\nrouting_strategy: priority\nload_balancing: true',
+      perfDelta: { latency: -8, errorRate: -15 },
+    },
+    {
+      version: 'v1',
+      timestamp: '2024-01-10T09:00:00Z',
+      author: 'Alex T.',
+      authorAvatar: 'AT',
+      summary: 'Initial routing implementation',
+      config: 'model: gpt-3.5-turbo\ntemperature: 0.3\nmax_tokens: 800\nrouting_strategy: round_robin\nload_balancing: false',
+      perfDelta: { latency: 0, errorRate: 0 },
+    },
+  ],
+  DataFetcher: [
+    {
+      version: 'v3',
+      timestamp: '2024-01-27T16:45:00Z',
+      author: 'Mike R.',
+      authorAvatar: 'MR',
+      summary: 'Implemented chunked processing for large payloads',
+      config: 'model: gpt-4-turbo\ntemperature: 0.1\nmax_tokens: 4000\nchunk_size: 10MB\nretry_policy: exponential',
+      perfDelta: { latency: 15, errorRate: -25 },
+    },
+    {
+      version: 'v2',
+      timestamp: '2024-01-18T13:20:00Z',
+      author: 'Sarah K.',
+      authorAvatar: 'SK',
+      summary: 'Added caching layer for repeated queries',
+      config: 'model: gpt-4-turbo\ntemperature: 0.1\nmax_tokens: 3000\ncache_ttl: 300\nretry_policy: linear',
+      perfDelta: { latency: -20, errorRate: -5 },
+    },
+    {
+      version: 'v1',
+      timestamp: '2024-01-10T09:00:00Z',
+      author: 'Alex T.',
+      authorAvatar: 'AT',
+      summary: 'Initial data fetching implementation',
+      config: 'model: gpt-3.5-turbo\ntemperature: 0.2\nmax_tokens: 2000\ncache_ttl: 0\nretry_policy: none',
+      perfDelta: { latency: 0, errorRate: 0 },
+    },
+  ],
+  Validator: [
+    {
+      version: 'v2',
+      timestamp: '2024-01-26T10:00:00Z',
+      author: 'Mike R.',
+      authorAvatar: 'MR',
+      summary: 'Added schema v2 validation support',
+      config: 'model: gpt-4-turbo\ntemperature: 0.0\nmax_tokens: 1500\nschema_version: v2\nstrict_mode: true',
+      perfDelta: { latency: 3, errorRate: -18 },
+    },
+    {
+      version: 'v1',
+      timestamp: '2024-01-10T09:00:00Z',
+      author: 'Alex T.',
+      authorAvatar: 'AT',
+      summary: 'Initial validation with schema v1',
+      config: 'model: gpt-3.5-turbo\ntemperature: 0.0\nmax_tokens: 1000\nschema_version: v1\nstrict_mode: false',
+      perfDelta: { latency: 0, errorRate: 0 },
+    },
+  ],
+  Responder: [
+    {
+      version: 'v2',
+      timestamp: '2024-01-24T15:30:00Z',
+      author: 'Sarah K.',
+      authorAvatar: 'SK',
+      summary: 'Improved response formatting and markdown support',
+      config: 'model: gpt-4-turbo\ntemperature: 0.6\nmax_tokens: 2500\nformat: markdown\ntone: professional',
+      perfDelta: { latency: 8, errorRate: -10 },
+    },
+    {
+      version: 'v1',
+      timestamp: '2024-01-10T09:00:00Z',
+      author: 'Alex T.',
+      authorAvatar: 'AT',
+      summary: 'Initial response generation',
+      config: 'model: gpt-3.5-turbo\ntemperature: 0.7\nmax_tokens: 1500\nformat: plain\ntone: neutral',
+      perfDelta: { latency: 0, errorRate: 0 },
+    },
+  ],
+};
+
+// Sankey diagram data for handoff flows
+export const sankeyData = {
+  nodes: [
+    { name: 'Supervisor' },
+    { name: 'Researcher' },
+    { name: 'DataFetcher' },
+    { name: 'Validator' },
+    { name: 'Responder' },
+  ],
+  links: [
+    { source: 0, target: 1, value: 89 },
+    { source: 0, target: 2, value: 145 },
+    { source: 1, target: 3, value: 67 },
+    { source: 1, target: 4, value: 22 },
+    { source: 2, target: 3, value: 178 },
+    { source: 2, target: 4, value: 56 },
+    { source: 3, target: 4, value: 178 },
+  ],
+};
+
+// Sandbox execution data
+export const sandboxExecutions = {
+  Researcher: {
+    input: 'What are the latest trends in AI agent orchestration?',
+    output: `Based on my analysis of recent developments in AI agent orchestration, here are the key trends:
+
+1. **Multi-Agent Collaboration**: Systems are moving from single-agent to multi-agent architectures where specialized agents work together.
+
+2. **Dynamic Routing**: Intelligent routing mechanisms that select the best agent for each task based on context and capabilities.
+
+3. **Observability & Monitoring**: Increased focus on tracing, metrics, and debugging tools for complex agent workflows.
+
+4. **Cost Optimization**: Techniques to reduce API costs through caching, model selection, and efficient prompt engineering.
+
+5. **Error Handling & Recovery**: Robust fallback mechanisms and retry strategies for production reliability.`,
+    trace: [
+      { step: 1, type: 'tool_call', tool: 'web_search', input: 'AI agent orchestration trends 2024', duration: '0.8s' },
+      { step: 2, type: 'reasoning', input: 'Analyzing search results for key patterns', duration: '1.2s' },
+      { step: 3, type: 'tool_call', tool: 'web_search', input: 'multi-agent systems best practices', duration: '0.6s' },
+      { step: 4, type: 'reasoning', input: 'Synthesizing findings into structured response', duration: '0.9s' },
+      { step: 5, type: 'output', input: 'Generating final response with markdown formatting', duration: '0.4s' },
+    ],
+    latency: 3.9,
+    cost: 0.024,
+  },
+  Supervisor: {
+    input: 'Route this customer query about pricing',
+    output: 'I\'ll route this to the Researcher agent for pricing information lookup, then validate the response before sending to the customer.',
+    trace: [
+      { step: 1, type: 'reasoning', input: 'Analyzing query intent: pricing inquiry', duration: '0.3s' },
+      { step: 2, type: 'tool_call', tool: 'agent_selector', input: 'Select best agent for pricing query', duration: '0.5s' },
+      { step: 3, type: 'output', input: 'Routing decision: Researcher → Validator → Responder', duration: '0.2s' },
+    ],
+    latency: 1.0,
+    cost: 0.008,
+  },
+  DataFetcher: {
+    input: 'Fetch customer data for user_12345',
+    output: 'Successfully retrieved customer data: User ID: user_12345, Name: John Doe, Plan: Enterprise, Status: Active, Last Login: 2024-01-28',
+    trace: [
+      { step: 1, type: 'tool_call', tool: 'database_query', input: 'SELECT * FROM customers WHERE id = user_12345', duration: '0.4s' },
+      { step: 2, type: 'reasoning', input: 'Validating data completeness', duration: '0.2s' },
+      { step: 3, type: 'output', input: 'Formatting response', duration: '0.1s' },
+    ],
+    latency: 0.7,
+    cost: 0.012,
+  },
+  Validator: {
+    input: 'Validate this response for schema compliance',
+    output: 'Validation passed: All required fields present, data types correct, no schema violations detected.',
+    trace: [
+      { step: 1, type: 'tool_call', tool: 'schema_validator', input: 'Check against schema v2', duration: '0.3s' },
+      { step: 2, type: 'reasoning', input: 'Verifying field types and constraints', duration: '0.4s' },
+      { step: 3, type: 'output', input: 'Generating validation report', duration: '0.1s' },
+    ],
+    latency: 0.8,
+    cost: 0.006,
+  },
+  Responder: {
+    input: 'Generate response for customer query',
+    output: 'Thank you for your inquiry! Based on your Enterprise plan, you have access to all premium features including priority support and advanced analytics. Is there anything specific you\'d like to know about your plan benefits?',
+    trace: [
+      { step: 1, type: 'reasoning', input: 'Analyzing customer context and query', duration: '0.5s' },
+      { step: 2, type: 'tool_call', tool: 'template_selector', input: 'Select appropriate response template', duration: '0.3s' },
+      { step: 3, type: 'reasoning', input: 'Personalizing response with customer data', duration: '0.6s' },
+      { step: 4, type: 'output', input: 'Generating final response', duration: '0.3s' },
+    ],
+    latency: 1.7,
+    cost: 0.018,
+  },
+};
+
+// Workspaces
+export const workspaces = [
+  { id: 1, name: 'Production', icon: '🚀', members: 12 },
+  { id: 2, name: 'Staging', icon: '🧪', members: 8 },
+  { id: 3, name: 'Development', icon: '💻', members: 15 },
+];
