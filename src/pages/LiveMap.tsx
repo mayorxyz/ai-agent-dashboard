@@ -1,384 +1,348 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useTheme } from '../contexts/ThemeContext';
 import {
   Search,
   Brain,
   Database,
   ShieldCheck,
   MessageSquare,
+  Activity,
+  CheckCircle2,
+  XCircle,
 } from 'lucide-react';
+import AgentNetworkGraph from '../components/AgentNetworkGraph';
 
-const nodes = [
-  { id: 'supervisor', name: 'Supervisor', icon: Brain, x: 400, y: 100, color: 'purple', status: 'active', load: 78 },
-  { id: 'researcher', name: 'Researcher', icon: Search, x: 150, y: 250, color: 'green', status: 'active', load: 65 },
-  { id: 'datafetcher', name: 'DataFetcher', icon: Database, x: 650, y: 250, color: 'blue', status: 'active', load: 92 },
-  { id: 'validator', name: 'Validator', icon: ShieldCheck, x: 250, y: 420, color: 'amber', status: 'idle', load: 34 },
-  { id: 'responder', name: 'Responder', icon: MessageSquare, x: 550, y: 420, color: 'coral', status: 'active', load: 56 },
+const agents = [
+  { id: 'supervisor', name: 'Supervisor', icon: Brain, color: 'purple', status: 'active' as const, load: 78 },
+  { id: 'researcher', name: 'Researcher', icon: Search, color: 'green', status: 'active' as const, load: 65 },
+  { id: 'datafetcher', name: 'DataFetcher', icon: Database, color: 'blue', status: 'active' as const, load: 92 },
+  { id: 'validator', name: 'Validator', icon: ShieldCheck, color: 'amber', status: 'idle' as const, load: 34 },
+  { id: 'responder', name: 'Responder', icon: MessageSquare, color: 'coral', status: 'active' as const, load: 56 },
 ];
 
-const edges = [
-  { from: 'supervisor', to: 'researcher', active: true, label: 'delegate' },
-  { from: 'supervisor', to: 'datafetcher', active: true, label: 'fetch' },
-  { from: 'researcher', to: 'validator', active: false, label: 'validate' },
-  { from: 'datafetcher', to: 'validator', active: true, label: 'verify' },
-  { from: 'validator', to: 'responder', active: true, label: 'respond' },
-  { from: 'researcher', to: 'responder', active: false, label: 'context' },
+const connections = [
+  { from: 'supervisor', to: 'researcher', value: 89, label: 'delegate' },
+  { from: 'supervisor', to: 'datafetcher', value: 145, label: 'fetch' },
+  { from: 'researcher', to: 'validator', value: 67, label: 'validate' },
+  { from: 'datafetcher', to: 'validator', value: 178, label: 'verify' },
+  { from: 'validator', to: 'responder', value: 178, label: 'respond' },
+  { from: 'researcher', to: 'responder', value: 22, label: 'context' },
 ];
 
 const activeTraces = [
-  { id: 'tr_8f2a', agent: 'Supervisor → Researcher', duration: '1.2s', status: 'running' },
-  { id: 'tr_9c3b', agent: 'DataFetcher → Validator', duration: '0.8s', status: 'running' },
-  { id: 'tr_7d4e', agent: 'Validator → Responder', duration: '2.1s', status: 'running' },
-  { id: 'tr_6a1f', agent: 'Supervisor → DataFetcher', duration: '0.5s', status: 'completed' },
-  { id: 'tr_5b2c', agent: 'Researcher → Responder', duration: '1.7s', status: 'completed' },
+  { id: 'tr_8f2a1b3c', agent: 'Supervisor', status: 'running', duration: '1.2s', timestamp: '2s ago' },
+  { id: 'tr_9c3b2d4e', agent: 'DataFetcher', status: 'running', duration: '0.8s', timestamp: '5s ago' },
+  { id: 'tr_7d4e5f6a', agent: 'Validator', status: 'completed', duration: '2.1s', timestamp: '8s ago' },
+  { id: 'tr_6a1b7c8d', agent: 'Supervisor', status: 'running', duration: '0.5s', timestamp: '12s ago' },
+  { id: 'tr_5b2c9d0e', agent: 'Researcher', status: 'completed', duration: '1.7s', timestamp: '15s ago' },
 ];
 
-const colorMap: Record<string, { bg: string; ring: string; icon: string }> = {
-  green: { bg: 'bg-green-500', ring: 'ring-green-200', icon: 'text-green-600' },
-  purple: { bg: 'bg-purple-500', ring: 'ring-purple-200', icon: 'text-purple-600' },
-  blue: { bg: 'bg-blue-500', ring: 'ring-blue-200', icon: 'text-blue-600' },
-  amber: { bg: 'bg-amber-500', ring: 'ring-amber-200', icon: 'text-amber-600' },
-  coral: { bg: 'bg-red-500', ring: 'ring-red-200', icon: 'text-red-600' },
+const agentColors: Record<string, string> = {
+  supervisor: '#8B5CF6',
+  researcher: '#10B981',
+  datafetcher: '#3B82F6',
+  validator: '#F59E0B',
+  responder: '#EF4444',
+};
+
+const agentIcons: Record<string, any> = {
+  supervisor: Brain,
+  researcher: Search,
+  datafetcher: Database,
+  validator: ShieldCheck,
+  responder: MessageSquare,
 };
 
 export default function LiveMap() {
+  const { isDark } = useTheme();
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
 
-  const getNodePos = (id: string) => {
-    const node = nodes.find(n => n.id === id);
-    return node ? { x: node.x, y: node.y } : { x: 0, y: 0 };
-  };
+  const getAgentData = (id: string) => agents.find(a => a.id === id);
 
   return (
-    <div className="space-y-6 w-full">
-      <div className="flex items-center justify-between flex-wrap gap-4">
+    <div className="space-y-6 xl:space-y-8 w-full">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="flex items-center justify-between flex-wrap gap-4"
+      >
         <div>
-          <h1 className="text-2xl font-bold text-[#111]">Live Map</h1>
-          <p className="text-sm text-[#6B7280] mt-1">Real-time agent communication graph</p>
+          <h1 className={`text-h1 ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>Live Map</h1>
+          <p className={`text-body mt-1 ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>
+            Real-time agent communication and request flow
+          </p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-sm font-medium">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+          <motion.div
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className={`px-3 py-1.5 rounded-full text-caption font-medium flex items-center gap-2 ${
+              isDark ? 'bg-green-900/30 text-green-400' : 'bg-green-50 text-green-700'
+            }`}
+          >
+            <div className="w-2 h-2 rounded-full bg-green-500" />
             Live
-          </span>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
 
+      {/* Main grid - 12-col */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 w-full">
-        {/* Main canvas */}
-        <div className="xl:col-span-8 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-h-[500px] relative overflow-hidden min-w-0">
-          <svg className="absolute inset-0 w-full h-full" viewBox="0 0 800 520">
-            {/* Edges */}
-            {edges.map((edge, i) => {
-              const from = getNodePos(edge.from);
-              const to = getNodePos(edge.to);
-              return (
-                <g key={i}>
-                  <line
-                    x1={from.x}
-                    y1={from.y}
-                    x2={to.x}
-                    y2={to.y}
-                    stroke={edge.active ? '#2F5CFF' : '#E5E7EB'}
-                    strokeWidth={edge.active ? 2 : 1}
-                    strokeDasharray={edge.active ? '6 4' : 'none'}
-                    className={edge.active ? 'animate-flow' : ''}
-                    opacity={edge.active ? 0.7 : 0.4}
-                  />
-                  {edge.active && (
-                    <circle r="4" fill="#2F5CFF" opacity="0.8">
-                      <animateMotion
-                        dur="2s"
-                        repeatCount="indefinite"
-                        path={`M${from.x},${from.y} L${to.x},${to.y}`}
-                      />
-                    </circle>
-                  )}
-                  {/* Edge label */}
-                  <text
-                    x={(from.x + to.x) / 2}
-                    y={(from.y + to.y) / 2 - 8}
-                    textAnchor="middle"
-                    className="text-[9px] fill-gray-400"
-                  >
-                    {edge.label}
-                  </text>
-                </g>
-              );
-            })}
+        {/* Agent Network - 8 cols (featured with shadow-lifted) */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="xl:col-span-8 min-w-0"
+        >
+          <AgentNetworkGraph
+            agents={agents}
+            connections={connections}
+            selectedNode={selectedNode}
+            onNodeClick={setSelectedNode}
+          />
+        </motion.div>
 
-            {/* Nodes */}
-            {nodes.map((node) => {
-              const colors = colorMap[node.color];
-              const Icon = node.icon;
-              const isSelected = selectedNode === node.id;
-              return (
-                <g
-                  key={node.id}
-                  onClick={() => setSelectedNode(isSelected ? null : node.id)}
-                  className="cursor-pointer"
-                >
-                  {/* Outer ring for active */}
-                  {node.status === 'active' && (
-                    <circle
-                      cx={node.x}
-                      cy={node.y}
-                      r="38"
-                      fill="none"
-                      stroke={colors.bg.replace('bg-', '').includes('green') ? '#10B981' : colors.bg.includes('purple') ? '#8B5CF6' : colors.bg.includes('blue') ? '#3B82F6' : colors.bg.includes('amber') ? '#F59E0B' : '#EF4444'}
-                      strokeWidth="1"
-                      opacity="0.3"
-                      className="animate-pulse-slow"
-                    />
-                  )}
-                  {/* Node background */}
-                  <circle
-                    cx={node.x}
-                    cy={node.y}
-                    r="32"
-                    fill="white"
-                    stroke={isSelected ? '#2F5CFF' : '#E5E7EB'}
-                    strokeWidth={isSelected ? 2 : 1}
-                    filter="drop-shadow(0 2px 4px rgba(0,0,0,0.05))"
-                  />
-                  {/* Status dot */}
-                  <circle
-                    cx={node.x + 22}
-                    cy={node.y - 22}
-                    r="5"
-                    fill={node.status === 'active' ? '#10B981' : '#9CA3AF'}
-                    stroke="white"
-                    strokeWidth="2"
-                  />
-                  {/* Icon - using Lucide icons */}
-                  <foreignObject x={node.x - 12} y={node.y - 12} width="24" height="24">
-                    <div className="w-6 h-6 flex items-center justify-center">
-                      {node.id === 'supervisor' && <Brain size={20} className="text-purple-500" />}
-                      {node.id === 'researcher' && <Search size={20} className="text-green-500" />}
-                      {node.id === 'datafetcher' && <Database size={20} className="text-blue-500" />}
-                      {node.id === 'validator' && <ShieldCheck size={20} className="text-amber-500" />}
-                      {node.id === 'responder' && <MessageSquare size={20} className="text-red-500" />}
-                    </div>
-                  </foreignObject>
-                  {/* Label */}
-                  <text
-                    x={node.x}
-                    y={node.y + 52}
-                    textAnchor="middle"
-                    className="text-[11px] font-medium fill-gray-700"
-                  >
-                    {node.name}
-                  </text>
-                  {/* Load indicator */}
-                  <text
-                    x={node.x}
-                    y={node.y + 66}
-                    textAnchor="middle"
-                    className="text-[9px] fill-gray-400"
-                  >
-                    {node.load}% load
-                  </text>
-                </g>
-              );
-            })}
-          </svg>
-        </div>
-
-        {/* Side panel */}
-        <div className="xl:col-span-4 space-y-4 min-w-0">
+        {/* Active Traces - 4 cols (shadow-subtle) */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="xl:col-span-4 space-y-6"
+        >
           {/* Active Traces */}
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+          <div className={`rounded-2xl p-6 ${
+            isDark ? 'bg-[#111113] border border-[#1F1F23]' : 'bg-white border border-gray-200/50'
+          }`} style={{ boxShadow: 'var(--shadow-subtle)' }}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-semibold text-[#111]">Active Traces</h2>
-              <span className="text-xs text-[#6B7280] bg-gray-50 px-2 py-1 rounded-full">
+              <h3 className={`text-h3 ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>
+                Active Traces
+              </h3>
+              <span className={`text-caption px-2 py-1 rounded-full ${
+                isDark ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-50 text-blue-600'
+              }`}>
                 {activeTraces.filter(t => t.status === 'running').length} running
               </span>
             </div>
             <div className="space-y-2">
-              {activeTraces.map((trace) => (
-                <div
-                  key={trace.id}
-                  className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-all cursor-pointer"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full ${trace.status === 'running' ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`} />
-                    <div>
-                      <p className="text-xs font-medium text-[#111]">{trace.agent}</p>
-                      <p className="text-[10px] text-[#9CA3AF]">{trace.id}</p>
+              {activeTraces.map((trace, idx) => {
+                const agentColor = agentColors[trace.agent.toLowerCase()];
+                return (
+                  <motion.div
+                    key={trace.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className={`relative p-3 rounded-xl transition-all duration-200 cursor-pointer overflow-hidden ${
+                      isDark ? 'bg-[#1F1F23] hover:bg-[#27272A]' : 'bg-gray-50 hover:bg-gray-100'
+                    }`}
+                  >
+                    {/* Agent color accent bar */}
+                    <div
+                      className="absolute left-0 top-0 bottom-0 w-1"
+                      style={{ backgroundColor: agentColor }}
+                    />
+                    <div className="flex items-center justify-between mb-1 pl-2">
+                      <span className={`text-caption font-mono ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                        {trace.id}
+                      </span>
+                      {trace.status === 'running' ? (
+                        <Activity size={14} className="text-blue-500 animate-pulse" />
+                      ) : trace.status === 'completed' ? (
+                        <CheckCircle2 size={14} className="text-green-500" />
+                      ) : (
+                        <XCircle size={14} className="text-red-500" />
+                      )}
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs font-medium text-[#111]">{trace.duration}</p>
-                    <p className={`text-[10px] ${trace.status === 'running' ? 'text-green-600' : 'text-gray-400'}`}>
-                      {trace.status}
+                    <p className={`text-body font-medium pl-2 ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>
+                      {trace.agent}
                     </p>
-                  </div>
-                </div>
-              ))}
+                    <div className="flex items-center justify-between mt-1 pl-2">
+                      <span className={`text-caption ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                        {trace.duration} · {trace.timestamp}
+                      </span>
+                      <span className={`text-caption font-medium ${
+                        trace.status === 'running' ? 'text-blue-500' :
+                        trace.status === 'completed' ? 'text-green-500' : 'text-red-500'
+                      }`}>
+                        {trace.status}
+                      </span>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
 
-          {/* Node Details */}
+          {/* Selected Node Details */}
           {selectedNode && (
-            <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className={`rounded-2xl p-6 ${
+                isDark ? 'bg-[#111113] border border-[#1F1F23]' : 'bg-white border border-gray-200/50'
+              }`}
+              style={{ boxShadow: 'var(--shadow-subtle)' }}
+            >
+              <h3 className={`text-h3 mb-4 ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>
+                {getAgentData(selectedNode)?.name} Details
+              </h3>
               {(() => {
-                const node = nodes.find(n => n.id === selectedNode);
-                if (!node) return null;
+                const agent = getAgentData(selectedNode);
+                if (!agent) return null;
+                const color = agentColors[agent.id];
+                const Icon = agentIcons[agent.id];
                 return (
-                  <div>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                        {node.id === 'supervisor' && <Brain size={20} className="text-purple-500" />}
-                        {node.id === 'researcher' && <Search size={20} className="text-green-500" />}
-                        {node.id === 'datafetcher' && <Database size={20} className="text-blue-500" />}
-                        {node.id === 'validator' && <ShieldCheck size={20} className="text-amber-500" />}
-                        {node.id === 'responder' && <MessageSquare size={20} className="text-red-500" />}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-12 h-12 rounded-full flex items-center justify-center"
+                        style={{
+                          backgroundColor: `${color}20`,
+                          boxShadow: `inset 0 0 0 1px ${color}33`,
+                        }}
+                      >
+                        <Icon size={20} style={{ color }} />
                       </div>
                       <div>
-                        <h3 className="text-sm font-semibold text-[#111]">{node.name}</h3>
-                        <span className={`text-[10px] font-medium ${node.status === 'active' ? 'text-green-600' : 'text-gray-400'}`}>
-                          {node.status === 'active' ? '● Active' : '○ Idle'}
-                        </span>
+                        <p className={`text-body font-semibold ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>
+                          {agent.name}
+                        </p>
+                        <p className={`text-caption ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                          {agent.status === 'active' ? '● Active' : '○ Idle'}
+                        </p>
                       </div>
                     </div>
-                    <div className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-xs text-[#6B7280]">Load</span>
-                        <span className="text-xs font-medium text-[#111]">{node.load}%</span>
-                      </div>
-                      <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-[#2F5CFF] rounded-full transition-all"
-                          style={{ width: `${node.load}%` }}
-                        />
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-xs text-[#6B7280]">Connections</span>
-                        <span className="text-xs font-medium text-[#111]">
-                          {edges.filter(e => e.from === node.id || e.to === node.id).length}
+                    <div className={`p-3 rounded-xl ${isDark ? 'bg-[#1F1F23]' : 'bg-gray-50'}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`text-caption ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Load</span>
+                        <span className={`text-body font-semibold ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>
+                          {agent.load}%
                         </span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-xs text-[#6B7280]">Avg Latency</span>
-                        <span className="text-xs font-medium text-[#111]">1.2s</span>
+                      <div className={`h-2 rounded-full overflow-hidden ${isDark ? 'bg-[#27272A]' : 'bg-gray-200'}`}>
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${agent.load}%` }}
+                          transition={{ duration: 0.5 }}
+                          className="h-full bg-[#2F5CFF] rounded-full"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className={`p-3 rounded-xl ${isDark ? 'bg-[#1F1F23]' : 'bg-gray-50'}`}>
+                        <p className={`text-caption ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Connections</p>
+                        <p className={`text-h3 font-bold ${isDark ? 'text-gray-100' : 'text-[#111]'}`} style={{ letterSpacing: '-0.01em' }}>
+                          {connections.filter(c => c.from === agent.id || c.to === agent.id).length}
+                        </p>
+                      </div>
+                      <div className={`p-3 rounded-xl ${isDark ? 'bg-[#1F1F23]' : 'bg-gray-50'}`}>
+                        <p className={`text-caption ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Avg Latency</p>
+                        <p className={`text-h3 font-bold ${isDark ? 'text-gray-100' : 'text-[#111]'}`} style={{ letterSpacing: '-0.01em' }}>1.2s</p>
                       </div>
                     </div>
                   </div>
                 );
               })()}
-            </div>
+            </motion.div>
           )}
-
-          {/* Legend */}
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-            <h3 className="text-sm font-semibold text-[#111] mb-3">Legend</h3>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-green-500" />
-                <span className="text-xs text-[#6B7280]">Active agent</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-gray-300" />
-                <span className="text-xs text-[#6B7280]">Idle agent</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-0.5 bg-[#2F5CFF]" style={{ backgroundImage: 'repeating-linear-gradient(90deg, #2F5CFF 0, #2F5CFF 4px, transparent 4px, transparent 8px)' }} />
-                <span className="text-xs text-[#6B7280]">Active message flow</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-0.5 bg-gray-200" />
-                <span className="text-xs text-[#6B7280]">Inactive connection</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        </motion.div>
       </div>
 
-      {/* Sankey Diagram - Handoff Volume */}
-      <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 w-full min-w-0">
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold text-[#111]">Handoff Volume</h2>
-          <p className="text-xs text-[#6B7280]">Agent-to-agent communication flow</p>
-        </div>
-        <div className="overflow-x-auto">
-          <svg viewBox="0 0 800 300" className="w-full min-w-[600px]" style={{ minHeight: '300px' }}>
-            {/* Nodes */}
-            <g>
-              {/* Supervisor */}
-              <rect x="50" y="100" width="80" height="100" fill="#8B5CF6" opacity="0.8" rx="4" />
-              <text x="90" y="155" textAnchor="middle" fill="white" fontSize="12" fontWeight="600">Supervisor</text>
-              
-              {/* Researcher */}
-              <rect x="250" y="50" width="80" height="80" fill="#10B981" opacity="0.8" rx="4" />
-              <text x="290" y="95" textAnchor="middle" fill="white" fontSize="12" fontWeight="600">Researcher</text>
-              
-              {/* DataFetcher */}
-              <rect x="250" y="170" width="80" height="100" fill="#3B82F6" opacity="0.8" rx="4" />
-              <text x="290" y="225" textAnchor="middle" fill="white" fontSize="12" fontWeight="600">DataFetcher</text>
-              
-              {/* Validator */}
-              <rect x="470" y="100" width="80" height="120" fill="#F59E0B" opacity="0.8" rx="4" />
-              <text x="510" y="165" textAnchor="middle" fill="white" fontSize="12" fontWeight="600">Validator</text>
-              
-              {/* Responder */}
-              <rect x="670" y="80" width="80" height="140" fill="#EF4444" opacity="0.8" rx="4" />
-              <text x="710" y="155" textAnchor="middle" fill="white" fontSize="12" fontWeight="600">Responder</text>
-            </g>
+      {/* Sankey Diagram - Handoff Volume (reskinned to match network graph) */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className={`rounded-3xl p-6 ${
+          isDark ? 'bg-[#111113] border border-[#1F1F23]' : 'bg-white border border-gray-200/50'
+        }`}
+        style={{ boxShadow: 'var(--shadow-lifted)' }}
+      >
+        <h3 className={`text-h3 mb-6 ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>
+          Handoff Volume
+        </h3>
+        <div className="relative">
+          {/* Ambient background */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className={`absolute inset-0 ${isDark ? 'opacity-[0.03]' : 'opacity-[0.05]'}`}
+              style={{
+                backgroundImage: `radial-gradient(circle at 50% 50%, ${isDark ? '#2F5CFF' : '#2F5CFF'} 1px, transparent 1px)`,
+                backgroundSize: '40px 40px',
+              }}
+            />
+          </div>
 
-            {/* Flows */}
-            <g opacity="0.6">
-              {/* Supervisor → Researcher (89) */}
-              <path d="M 130 130 C 200 130, 200 90, 250 90" fill="none" stroke="#8B5CF6" strokeWidth="12" />
-              <text x="190" y="100" textAnchor="middle" fill="#6B7280" fontSize="10">89</text>
+          <div className="relative h-[200px] flex items-center justify-around">
+            {agents.map((agent, idx) => {
+              const color = agentColors[agent.id];
+              const Icon = agentIcons[agent.id];
+              const totalFlow = connections
+                .filter(c => c.from === agent.id || c.to === agent.id)
+                .reduce((sum, c) => sum + c.value, 0);
               
-              {/* Supervisor → DataFetcher (145) */}
-              <path d="M 130 170 C 200 170, 200 220, 250 220" fill="none" stroke="#8B5CF6" strokeWidth="18" />
-              <text x="190" y="210" textAnchor="middle" fill="#6B7280" fontSize="10">145</text>
-              
-              {/* Researcher → Validator (67) */}
-              <path d="M 330 90 C 400 90, 400 140, 470 140" fill="none" stroke="#10B981" strokeWidth="8" />
-              <text x="400" y="110" textAnchor="middle" fill="#6B7280" fontSize="10">67</text>
-              
-              {/* DataFetcher → Validator (178) */}
-              <path d="M 330 220 C 400 220, 400 180, 470 180" fill="none" stroke="#3B82F6" strokeWidth="22" />
-              <text x="400" y="210" textAnchor="middle" fill="#6B7280" fontSize="10">178</text>
-              
-              {/* Validator → Responder (178) */}
-              <path d="M 550 160 C 620 160, 620 150, 670 150" fill="none" stroke="#F59E0B" strokeWidth="22" />
-              <text x="610" y="145" textAnchor="middle" fill="#6B7280" fontSize="10">178</text>
-              
-              {/* Researcher → Responder (22) */}
-              <path d="M 330 70 C 500 70, 500 100, 670 100" fill="none" stroke="#10B981" strokeWidth="3" />
-              <text x="500" y="80" textAnchor="middle" fill="#6B7280" fontSize="10">22</text>
-              
-              {/* DataFetcher → Responder (56) */}
-              <path d="M 330 250 C 500 250, 500 200, 670 200" fill="none" stroke="#3B82F6" strokeWidth="7" />
-              <text x="500" y="240" textAnchor="middle" fill="#6B7280" fontSize="10">56</text>
-            </g>
-          </svg>
+              return (
+                <motion.div
+                  key={agent.id}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="flex flex-col items-center gap-2"
+                >
+                  <div
+                    className="w-16 h-16 rounded-full flex items-center justify-center"
+                    style={{
+                      backgroundColor: `${color}20`,
+                      boxShadow: `inset 0 0 0 1px ${color}33`,
+                    }}
+                  >
+                    <Icon size={24} style={{ color }} />
+                  </div>
+                  <p className={`text-caption font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`} style={{ letterSpacing: '-0.01em' }}>
+                    {agent.name}
+                  </p>
+                  <p className={`text-caption ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                    {totalFlow} calls
+                  </p>
+                </motion.div>
+              );
+            })}
+
+            {/* Connection lines between nodes */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+              {connections.map((conn, idx) => {
+                const fromIdx = agents.findIndex(a => a.id === conn.from);
+                const toIdx = agents.findIndex(a => a.id === conn.to);
+                if (fromIdx === -1 || toIdx === -1) return null;
+
+                const fromX = (fromIdx / (agents.length - 1)) * 100;
+                const toX = (toIdx / (agents.length - 1)) * 100;
+                const maxVolume = Math.max(...connections.map(c => c.value));
+                const weight = 0.5 + (conn.value / maxVolume) * 2;
+
+                return (
+                  <motion.line
+                    key={idx}
+                    x1={`${fromX}%`}
+                    y1="50%"
+                    x2={`${toX}%`}
+                    y2="50%"
+                    stroke={agentColors[conn.from]}
+                    strokeWidth={weight}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.3 }}
+                    transition={{ delay: idx * 0.1 + 0.5 }}
+                  />
+                );
+              })}
+            </svg>
+          </div>
         </div>
-        <div className="mt-4 flex flex-wrap gap-4 text-xs text-[#6B7280]">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#8B5CF6' }} />
-            <span>Supervisor</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#10B981' }} />
-            <span>Researcher</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#3B82F6' }} />
-            <span>DataFetcher</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#F59E0B' }} />
-            <span>Validator</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#EF4444' }} />
-            <span>Responder</span>
-          </div>
-        </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
