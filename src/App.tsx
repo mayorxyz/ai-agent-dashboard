@@ -16,6 +16,14 @@ import Sandbox from './pages/Sandbox';
 import Status from './pages/Status';
 import Onboarding from './pages/Onboarding';
 import AgentDetail from './pages/AgentDetail';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
+import Notifications from './pages/Notifications';
+import Billing from './pages/Billing';
+import Team from './pages/Team';
+import Integrations from './pages/Integrations';
+import Help from './pages/Help';
+import NotFound from './pages/NotFound';
 
 export type Page = 'overview' | 'workflows' | 'livemap' | 'traces' | 'incidents' | 'insights' | 'cost' | 'compare' | 'roi' | 'sandbox';
 
@@ -76,9 +84,17 @@ function Layout() {
               <Route path="/compare" element={<Compare />} />
               <Route path="/roi" element={<ROI />} />
               <Route path="/sandbox" element={<Sandbox />} />
+              <Route path="/agent/:agentName" element={<AgentDetail />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/notifications" element={<Notifications />} />
+              <Route path="/billing" element={<Billing />} />
+              <Route path="/team" element={<Team />} />
+              <Route path="/integrations" element={<Integrations />} />
+              <Route path="/help" element={<Help />} />
               <Route path="/status" element={<Status />} />
               <Route path="/onboarding" element={<Onboarding />} />
-              <Route path="/agent/:agentName" element={<AgentDetail />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
         </main>

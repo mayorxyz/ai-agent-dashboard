@@ -444,7 +444,19 @@ export const sandboxExecutions = {
 
 // Workspaces
 export const workspaces = [
-  { id: 1, name: 'Production', icon: '🚀', members: 12 },
-  { id: 2, name: 'Staging', icon: '🧪', members: 8 },
-  { id: 3, name: 'Development', icon: '💻', members: 15 },
+  { id: 1, name: 'Production', icon: 'Rocket', members: 12 },
+  { id: 2, name: 'Staging', icon: 'FlaskConical', members: 8 },
+  { id: 3, name: 'Development', icon: 'Laptop', members: 15 },
+];
+
+// Notifications
+export const notifications = [
+  { id: 1, type: 'incident', title: 'DataFetcher timeout detected', desc: 'Error rate exceeded 5% threshold', time: '2 min ago', read: false },
+  { id: 2, type: 'system', title: 'New workflow auto-detected', desc: 'Research & Summarization flow', time: '15 min ago', read: false },
+  { id: 3, type: 'incident', title: 'Incident resolved', desc: 'INC-003: Rate limit exceeded', time: '1 hour ago', read: true },
+  { id: 4, type: 'system', title: 'Cost alert', desc: 'Daily spend approaching $50 threshold', time: '2 hours ago', read: true },
+  { id: 5, type: 'mention', title: 'Sarah K. mentioned you', desc: 'in incident INC-001 discussion', time: '3 hours ago', read: true },
+  { id: 6, type: 'incident', title: 'Validator schema mismatch', desc: 'Schema v2 validation failures', time: '4 hours ago', read: true },
+  { id: 7, type: 'system', title: 'System update available', desc: 'Version 2.4.1 is now available', time: '5 hours ago', read: true },
+  { id: 8, type: 'mention', title: 'Mike R. mentioned you', desc: 'in workflow configuration', time: '6 hours ago', read: true },
 ];

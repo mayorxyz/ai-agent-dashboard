@@ -149,15 +149,16 @@ export default function LiveMap() {
                     stroke="white"
                     strokeWidth="2"
                   />
-                  {/* Icon placeholder - using text */}
-                  <text
-                    x={node.x}
-                    y={node.y + 4}
-                    textAnchor="middle"
-                    className="text-lg"
-                  >
-                    {node.id === 'supervisor' ? '🧠' : node.id === 'researcher' ? '🔍' : node.id === 'datafetcher' ? '📊' : node.id === 'validator' ? '🛡️' : '💬'}
-                  </text>
+                  {/* Icon - using Lucide icons */}
+                  <foreignObject x={node.x - 12} y={node.y - 12} width="24" height="24">
+                    <div className="w-6 h-6 flex items-center justify-center">
+                      {node.id === 'supervisor' && <Brain size={20} className="text-purple-500" />}
+                      {node.id === 'researcher' && <Search size={20} className="text-green-500" />}
+                      {node.id === 'datafetcher' && <Database size={20} className="text-blue-500" />}
+                      {node.id === 'validator' && <ShieldCheck size={20} className="text-amber-500" />}
+                      {node.id === 'responder' && <MessageSquare size={20} className="text-red-500" />}
+                    </div>
+                  </foreignObject>
                   {/* Label */}
                   <text
                     x={node.x}
@@ -225,8 +226,12 @@ export default function LiveMap() {
                 return (
                   <div>
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="text-2xl">
-                        {node.id === 'supervisor' ? '🧠' : node.id === 'researcher' ? '🔍' : node.id === 'datafetcher' ? '📊' : node.id === 'validator' ? '🛡️' : '💬'}
+                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                        {node.id === 'supervisor' && <Brain size={20} className="text-purple-500" />}
+                        {node.id === 'researcher' && <Search size={20} className="text-green-500" />}
+                        {node.id === 'datafetcher' && <Database size={20} className="text-blue-500" />}
+                        {node.id === 'validator' && <ShieldCheck size={20} className="text-amber-500" />}
+                        {node.id === 'responder' && <MessageSquare size={20} className="text-red-500" />}
                       </div>
                       <div>
                         <h3 className="text-sm font-semibold text-[#111]">{node.name}</h3>

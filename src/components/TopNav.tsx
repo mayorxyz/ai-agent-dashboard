@@ -19,11 +19,25 @@ import {
   Check,
   CheckCheck,
   Plus,
+  Rocket,
+  FlaskConical,
+  Laptop,
+  type LucideIcon,
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import SearchModal from './SearchModal';
 import { workspaces } from '../data/mockData';
 import type { Page } from '../App';
+
+// Helper function to render workspace icon
+const getWorkspaceIcon = (iconName: string): LucideIcon => {
+  const iconMap: Record<string, LucideIcon> = {
+    'Rocket': Rocket,
+    'FlaskConical': FlaskConical,
+    'Laptop': Laptop,
+  };
+  return iconMap[iconName] || Rocket;
+};
 
 interface TopNavProps {
   activePage: Page;
@@ -262,7 +276,10 @@ export default function TopNav({ activePage, setActivePage }: TopNavProps) {
                   : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
               }`}
             >
-              <span className="text-base">{activeWorkspace.icon}</span>
+              {(() => {
+                const Icon = getWorkspaceIcon(activeWorkspace.icon);
+                return <Icon size={16} className={isDark ? 'text-gray-300' : 'text-gray-700'} />;
+              })()}
               <span className="hidden lg:inline">{activeWorkspace.name}</span>
               <ChevronDown size={14} className={isDark ? 'text-gray-400' : 'text-gray-500'} />
             </button>
@@ -291,7 +308,10 @@ export default function TopNav({ activePage, setActivePage }: TopNavProps) {
                           : isDark ? 'text-gray-300 hover:bg-[#27272A]' : 'text-gray-700 hover:bg-gray-50'
                       }`}
                     >
-                      <span className="text-lg">{workspace.icon}</span>
+                      {(() => {
+                        const Icon = getWorkspaceIcon(workspace.icon);
+                        return <Icon size={18} className={isDark ? 'text-gray-300' : 'text-gray-700'} />;
+                      })()}
                       <div className="flex-1 text-left">
                         <p className="font-medium">{workspace.name}</p>
                         <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>

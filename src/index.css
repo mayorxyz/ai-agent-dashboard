@@ -4,24 +4,70 @@
 
 @theme {
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  
+  /* Base colors - Light mode */
   --color-bg: #F3F3F4;
   --color-card: #FFFFFF;
-  --color-primary: #2F5CFF;
-  --color-primary-light: #EEF2FF;
+  --color-border: #E5E7EB;
+  
+  /* Text colors */
   --color-text-dark: #111111;
   --color-text-body: #6B7280;
   --color-text-muted: #9CA3AF;
-  --color-border: #E5E7EB;
+  
+  /* Primary */
+  --color-primary: #2F5CFF;
+  --color-primary-light: #EEF2FF;
+  
+  /* Agent colors - Light mode */
   --color-green: #10B981;
   --color-green-bg: #D1FAE5;
+  --color-green-text: #065F46;
+  
   --color-purple: #8B5CF6;
   --color-purple-bg: #EDE9FE;
+  --color-purple-text: #5B21B6;
+  
   --color-blue: #3B82F6;
   --color-blue-bg: #DBEAFE;
+  --color-blue-text: #1E40AF;
+  
   --color-amber: #F59E0B;
   --color-amber-bg: #FEF3C7;
+  --color-amber-text: #92400E;
+  
   --color-coral: #EF4444;
   --color-coral-bg: #FEE2E2;
+  --color-coral-text: #991B1B;
+}
+
+/* Dark mode overrides */
+.dark {
+  --color-bg: #0A0A0B;
+  --color-card: #111113;
+  --color-border: #1F1F23;
+  
+  --color-text-dark: #F9FAFB;
+  --color-text-body: #9CA3AF;
+  --color-text-muted: #6B7280;
+  
+  --color-primary-light: #1E3A8A;
+  
+  /* Agent colors - Dark mode (darker backgrounds, lighter icons/text) */
+  --color-green-bg: #064E3B;
+  --color-green-text: #A7F3D0;
+  
+  --color-purple-bg: #4C1D95;
+  --color-purple-text: #DDD6FE;
+  
+  --color-blue-bg: #1E3A8A;
+  --color-blue-text: #BFDBFE;
+  
+  --color-amber-bg: #78350F;
+  --color-amber-text: #FDE68A;
+  
+  --color-coral-bg: #7F1D1D;
+  --color-coral-text: #FECACA;
 }
 
 /* Fix #4: Global rules */
@@ -45,18 +91,12 @@ html, body {
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: #F3F3F4;
-  color: #111111;
+  background-color: var(--color-bg);
+  color: var(--color-text-dark);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-display: swap;
   transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* Dark mode base styles */
-.dark body {
-  background-color: #0A0A0B;
-  color: #F9FAFB;
 }
 
 #root {
