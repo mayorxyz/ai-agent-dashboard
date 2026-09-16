@@ -14,6 +14,7 @@ import {
   Database,
 } from 'lucide-react';
 import { EmptyState } from '../components/EmptyState';
+import { useTheme } from '../contexts/ThemeContext';
 
 const incidents = [
   {
@@ -118,6 +119,7 @@ const statusConfig: Record<string, { bg: string; text: string; dot: string }> = 
 };
 
 export default function Incidents() {
+  const { isDark } = useTheme();
   const [selectedIncident, setSelectedIncident] = useState<typeof incidents[0] | null>(null);
 
   if (selectedIncident) {
@@ -129,13 +131,17 @@ export default function Incidents() {
       <div className="space-y-6 w-full">
         <button
           onClick={() => setSelectedIncident(null)}
-          className="inline-flex items-center gap-2 text-sm text-[#6B7280] hover:text-[#111] active:scale-95 transition-all"
+          className={`inline-flex items-center gap-2 text-sm active:scale-95 transition-all ${
+            isDark ? 'text-gray-400 hover:text-gray-200' : 'text-[#6B7280] hover:text-[#111]'
+          }`}
         >
           <ChevronRight size={14} className="rotate-180" />
           Back to incidents
         </button>
 
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className={`rounded-3xl shadow-sm border overflow-hidden ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
           {/* Severity bar */}
           <div className={`h-1.5 ${sevColors.bar}`} />
           
@@ -151,8 +157,8 @@ export default function Incidents() {
                     {selectedIncident.status.charAt(0).toUpperCase() + selectedIncident.status.slice(1)}
                   </span>
                 </div>
-                <h1 className="text-xl font-bold text-[#111]">{selectedIncident.title}</h1>
-                <div className="flex items-center gap-4 mt-2 text-sm text-[#6B7280]">
+                <h1 className={`text-xl font-bold ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>{selectedIncident.title}</h1>
+                <div className={`flex items-center gap-4 mt-2 text-sm ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>
                   <span className="flex items-center gap-1.5">
                     <AgentIcon size={14} />
                     {selectedIncident.agent}
@@ -168,31 +174,35 @@ export default function Incidents() {
                 <div className={`w-8 h-8 rounded-full ${selectedIncident.assigneeColor} flex items-center justify-center text-white text-xs font-semibold`}>
                   {selectedIncident.assignee.charAt(0)}
                 </div>
-                <span className="text-sm text-[#6B7280]">{selectedIncident.assignee}</span>
+                <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>{selectedIncident.assignee}</span>
               </div>
             </div>
 
             {/* Timeline */}
-            <div className="border-t border-gray-100 pt-6">
-              <h2 className="text-base font-semibold text-[#111] mb-4">Incident Timeline</h2>
+            <div className={`border-t pt-6 ${isDark ? 'border-[#1F1F23]' : 'border-gray-100'}`}>
+              <h2 className={`text-base font-semibold mb-4 ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>Incident Timeline</h2>
               <div className="relative pl-8">
-                <div className="absolute left-3 top-2 bottom-2 w-px bg-gray-200" />
+                <div className={`absolute left-3 top-2 bottom-2 w-px ${isDark ? 'bg-[#27272A]' : 'bg-gray-200'}`} />
                 <div className="space-y-6">
                   {selectedIncident.events.map((event, i) => {
                     const EventIcon = event.icon;
                     return (
                       <div key={i} className="relative flex items-start gap-4">
-                        <div className="absolute -left-5 w-6 h-6 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center">
-                          <EventIcon size={12} className="text-gray-500" />
+                        <div className={`absolute -left-5 w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                          isDark ? 'bg-[#111113] border-[#27272A]' : 'bg-white border-gray-200'
+                        }`}>
+                          <EventIcon size={12} className={isDark ? 'text-gray-400' : 'text-gray-500'} />
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-medium text-[#111]">{event.time}</span>
-                            <span className="text-[10px] text-[#9CA3AF] bg-gray-50 px-2 py-0.5 rounded-full">
+                            <span className={`text-xs font-medium ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>{event.time}</span>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                              isDark ? 'text-gray-400 bg-[#1F1F23]' : 'text-[#9CA3AF] bg-gray-50'
+                            }`}>
                               {event.type}
                             </span>
                           </div>
-                          <p className="text-sm text-[#6B7280] mt-1">{event.message}</p>
+                          <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>{event.message}</p>
                         </div>
                       </div>
                     );
@@ -210,8 +220,8 @@ export default function Incidents() {
     <div className="space-y-6 w-full">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#111]">Incidents</h1>
-          <p className="text-sm text-[#6B7280] mt-1">Track and resolve issues in your agent system</p>
+          <h1 className={`text-2xl font-bold ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>Incidents</h1>
+          <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>Track and resolve issues in your agent system</p>
         </div>
         <div className="flex items-center gap-3">
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 rounded-full text-sm font-medium">
@@ -223,21 +233,29 @@ export default function Incidents() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 min-w-0">
+        <div className={`rounded-2xl p-4 shadow-sm border min-w-0 ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
           <p className="text-2xl font-bold text-red-600">2</p>
-          <p className="text-xs text-[#6B7280]">Open</p>
+          <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>Open</p>
         </div>
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 min-w-0">
+        <div className={`rounded-2xl p-4 shadow-sm border min-w-0 ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
           <p className="text-2xl font-bold text-amber-600">1</p>
-          <p className="text-xs text-[#6B7280]">Investigating</p>
+          <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>Investigating</p>
         </div>
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 min-w-0">
+        <div className={`rounded-2xl p-4 shadow-sm border min-w-0 ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
           <p className="text-2xl font-bold text-green-600">2</p>
-          <p className="text-xs text-[#6B7280]">Resolved today</p>
+          <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>Resolved today</p>
         </div>
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 min-w-0">
-          <p className="text-2xl font-bold text-[#111]">18m</p>
-          <p className="text-xs text-[#6B7280]">Avg resolution</p>
+        <div className={`rounded-2xl p-4 shadow-sm border min-w-0 ${
+          isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
+        }`}>
+          <p className={`text-2xl font-bold ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>18m</p>
+          <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>Avg resolution</p>
         </div>
       </div>
 
@@ -258,23 +276,29 @@ export default function Incidents() {
             <div
               key={incident.id}
               onClick={() => setSelectedIncident(incident)}
-              className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all cursor-pointer overflow-hidden flex w-full"
+              className={`rounded-2xl shadow-sm border transition-all cursor-pointer overflow-hidden flex w-full ${
+                isDark 
+                  ? 'bg-[#111113] border-[#1F1F23] hover:border-[#27272A]' 
+                  : 'bg-white border-gray-100 hover:border-gray-200'
+              }`}
             >
               {/* Severity bar */}
               <div className={`w-1.5 flex-shrink-0 ${sevColors.bar}`} />
               
-              <div className="flex-1 p-5 flex items-center gap-4 min-w-0">
+              <div className={`flex-1 p-5 flex items-center gap-4 min-w-0 ${
+                isDark ? 'hover:bg-[#1F1F23]' : 'hover:bg-gray-50'
+              } transition-all`}>
                 <div className={`w-10 h-10 rounded-xl ${sevColors.bg} flex items-center justify-center flex-shrink-0`}>
                   <AgentIcon size={18} className={sevColors.text} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <h3 className="text-sm font-semibold text-[#111] truncate">{incident.title}</h3>
+                    <h3 className={`text-sm font-semibold truncate ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>{incident.title}</h3>
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${sevColors.bg} ${sevColors.text} flex-shrink-0 whitespace-nowrap`}>
                       {incident.severity}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-[#6B7280] flex-wrap">
+                  <div className={`flex items-center gap-2 text-xs ${isDark ? 'text-gray-400' : 'text-[#6B7280]'} flex-wrap`}>
                     <span className="whitespace-nowrap">{incident.agent}</span>
                     <span>·</span>
                     <span className="whitespace-nowrap">{incident.timestamp}</span>
@@ -291,7 +315,7 @@ export default function Incidents() {
                   <div className={`w-7 h-7 rounded-full ${incident.assigneeColor} flex items-center justify-center text-white text-[10px] font-semibold flex-shrink-0`}>
                     {incident.assignee.charAt(0)}
                   </div>
-                  <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
+                  <ChevronRight size={16} className={isDark ? 'text-gray-600' : 'text-gray-300'} />
                 </div>
               </div>
             </div>
