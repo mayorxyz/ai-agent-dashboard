@@ -13,6 +13,7 @@ import {
   Brain,
   Database,
 } from 'lucide-react';
+import { EmptyState } from '../components/EmptyState';
 
 const incidents = [
   {
@@ -241,6 +242,13 @@ export default function Incidents() {
       </div>
 
       {/* Incident list */}
+      {incidents.length === 0 ? (
+        <EmptyState
+          type="incidents"
+          title="All clear!"
+          description="No incidents detected. Your agent system is running smoothly."
+        />
+      ) : (
       <div className="space-y-3 w-full">
         {incidents.map((incident) => {
           const sevColors = severityColors[incident.severity];
@@ -290,6 +298,7 @@ export default function Incidents() {
           );
         })}
       </div>
+      )}
     </div>
   );
 }

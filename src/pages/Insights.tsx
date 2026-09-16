@@ -25,6 +25,7 @@ import {
   Legend,
 } from 'recharts';
 import { insightsData, agents } from '../data/mockData';
+import { EmptyState } from '../components/EmptyState';
 
 export default function Insights() {
   const { isDark } = useTheme();
@@ -63,6 +64,9 @@ export default function Insights() {
     return `rgba(47, 92, 255, ${0.1 + intensity * 0.9})`;
   };
 
+  // Check if there's any data to show
+  const hasData = insightsData.anomalies.length > 0 || insightsData.latencyOverTime.length > 0;
+
   return (
     <div className="space-y-6 w-full">
       {/* Header */}
@@ -76,6 +80,14 @@ export default function Insights() {
           </p>
         </div>
       </div>
+
+      {!hasData && (
+        <EmptyState
+          type="insights"
+          title="No insights yet"
+          description="Insights will appear here as your agents run and generate data. Check back soon for performance analytics."
+        />
+      )}
 
       {/* Top Stat Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">

@@ -28,6 +28,8 @@ import {
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import Sparkline from '../components/Sparkline';
+import { AssistantAvatar } from '../components/AssistantAvatar';
+import { OverviewSkeleton } from '../components/Skeleton';
 import { sparklineData, anomalyFeed } from '../data/mockData';
 import type { Page } from '../App';
 
@@ -77,6 +79,7 @@ const timeRanges = ['Last 1h', 'Last 24h', 'Last 7d', 'Last 30d', 'Custom'];
 export default function Overview() {
   const navigate = useNavigate();
   const { isDark } = useTheme();
+  const [isLoading, setIsLoading] = useState(true);
   const [showFilter, setShowFilter] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedTimeRange, setSelectedTimeRange] = useState('Last 1h');
@@ -89,6 +92,12 @@ export default function Overview() {
 
   const filterRef = useRef<HTMLDivElement>(null);
   const timeRef = useRef<HTMLDivElement>(null);
+
+  // Simulate loading state
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -156,6 +165,10 @@ export default function Overview() {
       }, 800);
     }, 100);
   };
+
+  if (isLoading) {
+    return <OverviewSkeleton />;
+  }
 
   return (
     <div className="space-y-6 w-full">
@@ -497,9 +510,7 @@ export default function Overview() {
           isDark ? 'bg-[#111113] border-[#1F1F23]' : 'bg-white border-gray-100'
         }`}>
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-blue-500 flex items-center justify-center flex-shrink-0">
-              <Sparkles size={14} className="text-white" />
-            </div>
+            <AssistantAvatar size={32} className="flex-shrink-0" />
             <div className="min-w-0">
               <p className={`text-sm font-semibold ${isDark ? 'text-gray-100' : 'text-[#111]'}`}>AI Assistant</p>
               <p className={`text-[10px] ${isDark ? 'text-gray-400' : 'text-[#6B7280]'}`}>Welcome, Alex — what can I help with?</p>

@@ -17,6 +17,7 @@ import {
   X,
   ChevronDown,
 } from 'lucide-react';
+import { EmptyState } from '../components/EmptyState';
 
 const colorMap: Record<string, { bg: string; text: string; icon: string; border: string }> = {
   green: { bg: 'bg-green-50', text: 'text-green-700', icon: 'text-green-500', border: 'border-green-200' },
@@ -162,6 +163,17 @@ export default function Workflows() {
         </button>
       </div>
 
+      {workflows.length === 0 ? (
+        <EmptyState
+          type="workflows"
+          title="No workflows yet"
+          description="Create your first workflow to start orchestrating your AI agents and automating tasks."
+          action={{
+            label: 'Create your first workflow',
+            onClick: () => setShowNewModal(true),
+          }}
+        />
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
         {workflows.map((wf) => (
           <div
@@ -218,6 +230,7 @@ export default function Workflows() {
           </div>
         ))}
       </div>
+      )}
 
       {/* New Workflow Modal - Fix #7 */}
       {showNewModal && (

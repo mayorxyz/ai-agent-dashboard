@@ -10,6 +10,7 @@ import {
   Filter,
   Download,
 } from 'lucide-react';
+import { EmptyState } from '../components/EmptyState';
 
 const colorMap: Record<string, { bg: string; icon: string }> = {
   green: { bg: 'bg-green-50', icon: 'text-green-500' },
@@ -160,6 +161,13 @@ export default function Traces() {
       </div>
 
       {/* Traces list */}
+      {filteredTraces.length === 0 ? (
+        <EmptyState
+          type="traces"
+          title="No traces found"
+          description="Traces will appear here as your agents execute workflows. Adjust filters to see more results."
+        />
+      ) : (
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden w-full">
         <div className="overflow-x-auto scrollbar-hide">
           {/* Table header */}
@@ -269,6 +277,7 @@ export default function Traces() {
         })}
         </div>
       </div>
+      )}
     </div>
   );
 }
